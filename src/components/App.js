@@ -7,7 +7,7 @@ import {
   View, 
   Picker 
 } from "react-native"
-// import { CheckBox } from 'react-native-elements'
+import { CheckBox } from 'react-native-elements'
 import CustomInputText from './customInput'
 import cogito from '../assets/cogito_loading.gif'
 
@@ -133,20 +133,20 @@ export default class App extends Component {
             </Text>
           </View>
           <View style={styles.typeContainer}>
-            {/*<CheckBox
+            <CheckBox
               title="Custom"
               name="custom"
               checkedIcon="dot-circle-o"
               uncheckedIcon="circle-o"
-              checked={this.state.selectedType}
+              checked={this.state.selectedOption}
             />
             <CheckBox
               title="Numbers"
               name="custom"
               checkedIcon="dot-circle-o"
               uncheckedIcon="circle-o"
-              checked={this.state.selectedType}
-            />*/}
+              checked={this.state.selectedOption}
+            />
           </View>
           <View style={styles.inputListContainer}>
             <Text style={styles.inputListTitleText}>
