@@ -11,13 +11,13 @@ import {
 import CustomInputText from './customInput'
 import cogito from '../assets/cogito_loading.gif'
 
-const Link = props => (
+/* const Link = props => (
   <Text
     {...props}
     accessibilityRole="link"
     style={[styles.link, props.style]}
   />
-);
+); */
 
  const InputList = ({ inputs, handleChange, removeInputText }) => (
   <Fragment>
