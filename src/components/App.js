@@ -38,31 +38,6 @@ export default class App extends Component {
     answer: ''
   }
 
-  addInputText = () => {
-    const { maxInputIndex } = this.state
-    const newInput = `input-${maxInputIndex}`
-    this.setState(prevState => ({
-      inputs: prevState.inputs.concat([newInput]),
-      maxInputIndex: maxInputIndex + 1,
-    }))
-  }
-
-  removeInputText = (field, value) => {
-    const { inputs } = this.state
-    if (field !== inputs[0] && value.length === 0) {
-      const currItems = Object.assign({}, this.state.items);
-      delete currItems[field];
-      const initVal = currItems['input-0'].length === 0 ? 1 : 0;
-      if (inputs.length - Object.keys(currItems).length + initVal > 1) {
-        inputs.splice(inputs.indexOf(field), 1);
-      }
-      this.setState({
-        inputs,
-        items: currItems,
-      })
-    }
-  }
-
   handlePickerItemChange = e => {
     const { placeholder: name, value } = e.currentTarget
     this.setState(
@@ -92,8 +67,10 @@ export default class App extends Component {
     this.setState(
       produce(draft => {
         if (items.length > 1 && blankIndices.length > 1) {
-          blankIndices.forEach((blankIndex, i) => { // remove blank value items
-            if (i !== blankIndices.length - 1) draft.items.splice(blankIndex, 1)
+          blankIndices.forEach((blankIndex, i, arr) => { // remove blank value items
+            if (i !== arr.length - 1) {
+              draft.items.splice(blankIndex, 1)
+            }
           })
         } else if (blankIndices.length === 0) {
           const newItem = {
