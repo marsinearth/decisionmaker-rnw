@@ -3,17 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "babel-polyfill": "^6.26.0",
     "immer": "^1.3.1",
     "react": "^16.4.1",
     "react-app-rewired": "^1.5.2",
     "react-art": "^16.4.1",
     "react-dom": "^16.4.1",
+    "react-infinite-scroller": "^1.2.0",
     "react-native": "0.55.4",
     "react-native-elements": "Gregor1971/react-native-elements#master",
     "react-native-vector-icons": "^4.6.0",
     "react-native-web": "^0.8.9",
-    "react-scripts": "1.1.4"
+    "react-scripts": "1.1.4",
+    "rmc-picker": "file:./src/lib/rmc-picker/",
+    "zscroller": "file:./src/lib/zscroller/"
   },
   "scripts": {
     "start": "react-app-rewired start",
@@ -22,10 +24,9 @@
     "eject": "react-app-rewired eject"
   },
   "devDependencies": {
-    "babel-core": "^6.26.3",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-plugin-transform-react-jsx-source": "^6.22.0",
-    "react-app-rewire-babel-loader": "^0.1.1",
-    "react-app-rewire-polyfills": "^0.2.0"
+    "create-react-class": "^15.6.3",
+    "react-app-rewire-babel-loader": "^0.1.1"
   }
 }

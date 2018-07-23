@@ -20,7 +20,6 @@ const CustomInputList = ({
         onChange={handlePickerItemChange}
         onBlur={handlePickerItemBlur}
         value={value}
-        // blur={removeInputText}
       />
     ))}
   </Fragment>

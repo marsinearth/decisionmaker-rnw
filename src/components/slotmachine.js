@@ -1,31 +1,12 @@
-import React, { PureComponent } from 'react';
-import Picker from 'rmc-picker/lib/Picker.web';
-import Popup from 'rmc-picker/lib/Popup.web';
+import React, { PureComponent } from 'react'
+import Picker from 'rmc-picker/lib/Picker.web'
+import Popup from 'rmc-picker/lib/Popup.web'
+import InfiniteScroll from 'react-infinite-scroller'
+import produce from 'immer'
 
-function generateArray(_obj, type) {
-  let init = 0,
-    limit,
-    startIdx = 0,
-    endIdx = 59,
-    valsArray = [];
-  const array = [],
-    obj = Object.assign({}, _obj);
-  if (type === 'custom') {
-    valsArray = Object.values(obj);
-    limit = Math.floor(1000 / valsArray.length);
-    endIdx = valsArray.length;
-  } else {
-    startIdx = Number(obj['fromNum']);
-    endIdx =
-      Number(obj['toNum']) >= 0
-        ? Number(obj['toNum']) + 1
-        : Number(obj['toNum']) - 1;
-    const gapValue =
-      endIdx >= startIdx
-        ? Math.abs(endIdx - startIdx)
-        : Math.abs(startIdx - endIdx);
-    limit = Math.floor(1000 / gapValue);
-  }
+const generateArray = ({ data, startIdx, endIdx, limit }) => {
+  let init = 0
+  const array = []
   for (let j = 0; j < limit; j++) {
     for (
       let i = startIdx;
@@ -33,57 +14,96 @@ function generateArray(_obj, type) {
       endIdx >= startIdx ? i++ : i--
     ) {
       array.push({
-        label: type === 'custom' ? String(valsArray[i]) : String(i),
-        value: String(init++),
+        label: String(data[i]),
+        value: String(init++)
       });
     }
   }
-  return array;
+  return array
 }
 
-class Slotmachine extends PureComponent {
+class InfinitePicker extends PureComponent {
+  render() {
+    const { items } = this.props
+    return (
+      <Picker>
+        {items}
+      </Picker>
+    )
+  }
+}
+
+export default class Slotmachine extends PureComponent {
   state = {
-    disabled: false,
     items: [],
     value: '',
   };
 
-  static getDerivedStateFromProps(nextProps, prevState) {
-    if (nextProps.disabled !== prevState.disabled) {
-      return {
-        disabled: nextProps.disabled
-      }
-    }
-    return null
-  }
+  componentDidUpdate(prevProps, prevState) {
+    const { items: { length: itemsLength }} = this.state
+    const { items: { length: prevItemsLength }} = prevState
+    if (itemsLength !== prevItemsLength) {
 
-  onOK = () => {
-    const { option, items, nums } = this.props
-    const inputObj = option === 'custom' ? items : nums
-    if (typeof inputObj !== 'undefined') {
-      const items = generateArray(inputObj, option)
-      const num =
-        option === 'custom'
-          ? Object.keys(inputObj).length
-          : Math.abs(Number(inputObj['toNum']) - Number(inputObj['fromNum'])) + 1
-      const comp = Math.floor(Math.floor(1000 / num) * num / 2)
-      const value = String(comp - comp % num)
-      this.setState({
-        items,
-        value,
-      })
     }
   }
 
-  onChange = value => {
-    const items = this.state.items[value]
-    this.setState({ value: value }, () => {
-      this.props.answer(items['label'])
+  onReady = () => {
+    const { num, ...processedData } = this.dataPrepare()
+    console.log('num: ', num)
+    const generatedItems = generateArray({...processedData})
+    const itemsLength = generatedItems.length
+    const value = this.calibrateValue(itemsLength, num)
+    this.setState({ items: generatedItems, value })
+  }
+
+  onOK = value => {
+    const item = this.state.items[value]
+    this.setState({ value }, () => {
+      this.props.answer(item['label'])
     })
   }
 
+  onLoadMore = () => {
+    const { num, ...processedData } = this.dataPrepare()
+    const generatedItems = generateArray({...processedData})
+    this.setState(
+      produce(draft => {
+        draft.items.concat(generatedItems)
+        const itemsLength = draft.items.length
+        const value = this.calibrateValue(itemsLength, num)
+        draft.value = value
+      })
+    )
+  }
+
+  calibrateValue = (dataLength, num) => {
+    const comp = Math.floor(Math.floor(dataLength / num) * num / 2)
+    return String(comp - comp % num)
+  }
+
+  dataPrepare = () => {
+    const { option, items, toNum, fromNum } = this.props
+    let data, num, startIdx, endIdx, limit
+    if (option === 'custom') {
+      data = items.map(item => item.value)
+      num = data.length
+      startIdx = 0
+      endIdx = num
+      limit = Math.floor(1000 / num)
+    } else {
+      num = Math.abs(toNum - fromNum) + 1
+      startIdx = fromNum
+      endIdx = toNum
+      limit = Math.floor(1000 / Math.abs(endIdx - startIdx))
+      data = Array.from(Array(limit).keys())
+    }
+    const returnObj = { data, startIdx, endIdx, limit, num }
+    return returnObj
+  }
+
   render() {
-    const { disabled, items, value } = this.state
+    const { disabled } = this.props
+    const { items, value } = this.state
     return (
       <div>
         <Popup
@@ -93,10 +113,10 @@ class Slotmachine extends PureComponent {
           picker={<Picker>{items}</Picker>}
           title="Roll & Pick!!!"
           value={value}
-          onOk={this.onChange}
+          onOk={this.onOK}
           disabled={disabled}
         >
-          <button disabled={disabled ? 'disabled' : false} onClick={this.onOK}>
+          <button disabled={disabled} onClick={this.onReady}>
             {'Ready'}
           </button>
         </Popup>
@@ -104,5 +124,3 @@ class Slotmachine extends PureComponent {
     )
   }
 }
-
-export default Slotmachine

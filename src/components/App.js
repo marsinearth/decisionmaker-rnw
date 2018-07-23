@@ -10,6 +10,7 @@ import {
 import { CheckBox } from 'react-native-elements'
 import produce from 'immer'
 import CustomInputList from './customInput'
+import Slotmachine from './slotmachine'
 import { findReactElement } from '../utils'
 import cogito from '../assets/cogito_loading.gif'
 
@@ -21,8 +22,6 @@ import cogito from '../assets/cogito_loading.gif'
   />
 ); */
 
- 
-
 export default class App extends Component {
   state = {
     selectedOption: 'custom',
@@ -30,12 +29,30 @@ export default class App extends Component {
     maxInputIndex: 1,
     fromNum: undefined,
     toNum: undefined,
-    nums: [],
     items: [{
       placeholder: 'item 1',
       value: ''
     }],
-    answer: ''
+    answer: '',
+    disabled: true
+  }
+
+  componentDidCatch(error, info) {
+    console.log('error: ', error)
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { items, items: { length: itemsLen }, selectedOption, fromNum, toNum } = this.state
+    const { items: { length: prevItemsLen }} = prevState
+    let { disabled } = this.state
+    if (itemsLen !== prevItemsLen) {
+      if (selectedOption === 'custom') {
+        disabled = items[0].value.trim() === ''
+      } else {
+        disabled = !fromNum || !toNum
+      }
+      this.setState({ disabled })
+    }    
   }
 
   handlePickerItemChange = e => {
@@ -53,34 +70,17 @@ export default class App extends Component {
   
   handlePickerItemBlur = e => {
     const { items } = this.state
-    let maxIndex = 1
-    const blankIndices = []
-    items.forEach(({ placeholder, value }, i) => {
-      if (String(value).trim() === '') { // find blank value of the items
-        blankIndices.push(i)
-      }
-      const itemIndex = Number(placeholder.slice(-1))
-      if (itemIndex > maxIndex) { // replace the bigger item number to get the maximum number
-        maxIndex = itemIndex
-      }
-    })
-    this.setState(
-      produce(draft => {
-        if (items.length > 1 && blankIndices.length > 1) {
-          blankIndices.forEach((blankIndex, i, arr) => { // remove blank value items
-            if (i !== arr.length - 1) {
-              draft.items.splice(blankIndex, 1)
-            }
-          })
-        } else if (blankIndices.length === 0) {
-          const newItem = {
-            placeholder: `item ${maxIndex + 1}`,
-            value: ''
-          }
-          draft.items.push(newItem) // add a new item with 1 higher than the maximum item number         
-        } 
-      })
-    )
+    const { currentTarget: { placeholder, value } = {}} = e
+    const inputIndex = items.findIndex(input => input.placeholder === placeholder)
+    if (String(value).trim() === '' && inputIndex !== items.length - 1) {
+      this.setState(
+        produce(draft => {
+          draft.items.splice(inputIndex, 1)
+        })
+      )
+    } else if (String(value).trim() !== '' && inputIndex === items.length - 1) {
+      this.addInputItem(placeholder)
+    }
   }
 
   handleInputChange = e => { // question and fromNum, toNum
@@ -100,8 +100,25 @@ export default class App extends Component {
     this.setState({ selectedOption: name })
   }
 
+  addInputItem = placeholder => {
+    let { maxInputIndex } = this.state
+    const itemIndex = Number(placeholder.slice(-1))
+    if (itemIndex > maxInputIndex) {
+      maxInputIndex = itemIndex
+    }
+    const newItem = {
+      placeholder: `item ${++maxInputIndex}`,
+      value: ''
+    }
+    this.setState(
+      produce(draft => {
+        draft.items.push(newItem)
+      })
+    )
+  }
+
   answerOn = answer => {
-    this.setState({ answer });
+    this.setState({ answer })
   }
 
   render() {
@@ -111,7 +128,8 @@ export default class App extends Component {
       fromNum, 
       toNum, 
       question, 
-      answer 
+      answer,
+      disabled 
     } = this.state
     return (
       <View style={styles.app}>
@@ -144,6 +162,10 @@ export default class App extends Component {
             <Text style={styles.answerText}>
               Answer
             </Text>
+            <TextInput
+              editable={false}
+              value={answer}
+            />
           </View>
           <View style={styles.typeContainer}>
             <CheckBox
@@ -195,7 +217,16 @@ export default class App extends Component {
               </Fragment>
             )}
           </View> 
-          <Picker>
+          <Slotmachine
+            option={selectedOption}
+            items={items}
+            fromNum={fromNum}
+            toNum={toNum}
+            onSubmitClick={this.handleSubmit}
+            disabled={disabled}
+            answer={this.answerOn}
+          />
+          {/* <Picker>
             {items.map((item, i) =>(
               <Picker.Item 
                 key={i}
@@ -203,7 +234,7 @@ export default class App extends Component {
                 value="value"
               />
             ))}
-          </Picker>
+          </Picker>*/}
         </View>
       </View>
     );

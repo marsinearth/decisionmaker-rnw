@@ -2,7 +2,6 @@ const path = require("path");
 const fs = require("fs");
 // const { injectBabelPlugin } = require("react-app-rewired");
 
-const rewirePolyfills = require("react-app-rewire-polyfills");
 const rewireBabelLoader = require("react-app-rewire-babel-loader");
 
 const appDirectory = fs.realpathSync(process.cwd());
@@ -10,8 +9,6 @@ const resolveApp = relativePath => path.resolve(appDirectory, relativePath);
 
 module.exports = function override(config, env) {
   // console.log(JSON.stringify(config, null, 2));
-  
-  config = rewirePolyfills(config, env);
 
   const vectorIcons = resolveApp("node_modules/react-native-vector-icons");
   const elements = resolveApp("node_modules/react-native-elements");
