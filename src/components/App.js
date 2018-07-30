@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react'
+import React, { PureComponent, Fragment } from 'react'
 import { 
   Image, 
   StyleSheet, 
@@ -22,7 +22,7 @@ import cogito from '../assets/cogito_loading.gif'
   />
 ); */
 
-export default class App extends Component {
+export default class App extends PureComponent {
   state = {
     selectedOption: 'custom',
     question: '',
@@ -35,10 +35,6 @@ export default class App extends Component {
     }],
     answer: '',
     disabled: true
-  }
-
-  componentDidCatch(error, info) {
-    console.log('error: ', error)
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -140,8 +136,12 @@ export default class App extends Component {
             resizeMode="contain"
             style={styles.logo}
           />
-          <Text style={styles.title}>
-            Decision Maker on React Native for Web
+          <Text 
+            style={styles.title}
+            accessibilityRole="heading"
+            aria-level="2"
+          >
+            Decision Maker{"\n"} on React Native for Web
           </Text>
         </View>
         <View style={styles.mainContainer}>
@@ -152,10 +152,11 @@ export default class App extends Component {
             <TextInput
               name="question"
               placeholder="type your question here"
+              placeholderTextColor="orange"
               onChange={this.handleInputChange}
               value={question}
               multiline
-              numberOfLines={1}
+              style={styles.questionText}
             />
           </View>        
           <View style={styles.answerContainer}>
@@ -243,8 +244,9 @@ export default class App extends Component {
 
 const styles = StyleSheet.create({
   app: {
-    marginHorizontal: "auto",
-    maxWidth: 500
+    flex: 1,
+    justifyContent: 'center',
+    marginHorizontal: "auto"
   },
   logo: {
     height: 130
@@ -253,6 +255,7 @@ const styles = StyleSheet.create({
     height: 'auto',    
   },
   title: {
+    fontFamily: 'bungee, cursive',
     fontWeight: 'bold',
     fontSize: "1.5rem",
     marginVertical: "1em",
@@ -260,17 +263,38 @@ const styles = StyleSheet.create({
     color: 'slategray'
   },
   mainContainer: {
-    padding: 20
+    flex: 1,
+    padding: 20,
+  },
+  questionContainer: {
+    justifyContent: 'center',
+    // alignItems: 'center',
+    borderWidth: 0,
+  },
+  questionText: {
+    width: '100%',
+    minHeight: 68,
+    wordWrap: 'break-word',
+    justifyContent: 'center',
+    paddingVertical: '1rem',
+    lineHeight: '2rem',
+    fontFamily: 'bungee, cursive',
+    fontSize: '1.25rem',
+    fontWeight: 'bold',
+    outline: 'none',
+    textAlign: 'center'
   },
   typeContainer: {
     flexDirection: 'row',
     justifyContent: 'center'
   },
   text: {
-    lineHeight: "1.5em",
-    fontSize: "1.125rem",
-    marginVertical: "1em",
-    textAlign: "center"
+    fontFamily: 'bungee, cursive',
+    lineHeight: "1.125rem",
+    fontSize: "0.85rem",
+    marginVertical: "0.3rem",
+    color: '#888',
+    textAlign: "center"    
   },
   link: {
     color: "#1B95E0"

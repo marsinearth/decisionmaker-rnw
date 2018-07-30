@@ -1,9 +1,16 @@
 import React from "react"
 import ReactDOM from "react-dom"
 import App from "./components/App"
+import ErrorBoundary from './components/errorBoundary'
 import registerServiceWorker from "./registerServiceWorker"
 
-ReactDOM.render(<App />, document.getElementById("root"));
+const ErrorProofApp = () => (
+  <ErrorBoundary>
+    <App />
+  </ErrorBoundary>
+)
+
+ReactDOM.render(<ErrorProofApp />, document.getElementById("root"));
 registerServiceWorker();
 
 const injectFonts = () => {
