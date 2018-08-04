@@ -1,8 +1,9 @@
 import React, { Fragment } from 'react';
-import { View, TextInput, StyleSheet } from 'react-native'
+import { View, TextInput } from 'react-native'
+import { inputStyles } from './App'
 
 const CustomInputText = props => (
-  <View>
+  <View style={inputStyles.inputContainer}>
     <TextInput {...props} />
   </View>
 )
@@ -17,9 +18,11 @@ const CustomInputList = ({
       <CustomInputText
         key={placeholder}
         placeholder={placeholder}        
+        placeholderTextColor="#888"
         onChange={handlePickerItemChange}
         onBlur={handlePickerItemBlur}
         value={value}
+        style={inputStyles.inputText}
       />
     ))}
   </Fragment>

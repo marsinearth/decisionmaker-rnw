@@ -1,27 +1,7 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _extends2 = require('babel-runtime/helpers/extends');
-
-var _extends3 = _interopRequireDefault(_extends2);
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _classnames = require('classnames');
-
-var _classnames2 = _interopRequireDefault(_classnames);
-
-var _MultiPickerMixin = require('./MultiPickerMixin');
-
-var _MultiPickerMixin2 = _interopRequireDefault(_MultiPickerMixin);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
+import _extends from 'babel-runtime/helpers/extends';
+import React from 'react';
+import classnames from 'classnames';
+import MultiPickerMixin from './MultiPickerMixin';
 var MultiPicker = function MultiPicker(props) {
     var prefixCls = props.prefixCls,
         className = props.className,
@@ -30,8 +10,8 @@ var MultiPicker = function MultiPicker(props) {
         style = props.style;
 
     var selectedValue = props.getValue();
-    var colElements = _react2['default'].Children.map(children, function (col, i) {
-        return _react2['default'].cloneElement(col, {
+    var colElements = React.Children.map(children, function (col, i) {
+        return React.cloneElement(col, {
             selectedValue: selectedValue[i],
             onValueChange: function onValueChange() {
                 for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
@@ -49,11 +29,10 @@ var MultiPicker = function MultiPicker(props) {
             }
         });
     });
-    return _react2['default'].createElement(
+    return React.createElement(
         'div',
-        (0, _extends3['default'])({}, rootNativeProps, { style: style, className: (0, _classnames2['default'])(className, prefixCls) }),
+        _extends({}, rootNativeProps, { style: style, className: classnames(className, prefixCls) }),
         colElements
     );
 };
-exports['default'] = (0, _MultiPickerMixin2['default'])(MultiPicker);
-module.exports = exports['default'];
+export default MultiPickerMixin(MultiPicker);

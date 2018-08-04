@@ -1,20 +1,21 @@
 import React from "react"
 import ReactDOM from "react-dom"
 import App from "./components/App"
-import ErrorBoundary from './components/errorBoundary'
 import registerServiceWorker from "./registerServiceWorker"
 
-const ErrorProofApp = () => (
-  <ErrorBoundary>
-    <App />
-  </ErrorBoundary>
-)
-
-ReactDOM.render(<ErrorProofApp />, document.getElementById("root"));
+ReactDOM.render(<App />, document.getElementById("root"));
 registerServiceWorker();
 
 const injectFonts = () => {
   const style = document.createElement("style");
+
+  /* const Link = props => (
+  <Text
+    {...props}
+    accessibilityRole="link"
+    style={[styles.link, props.style]}
+  />
+); */
 
   // fontAwesome
   const fontAwesomeFont = require("react-native-vector-icons/Fonts/FontAwesome.ttf");

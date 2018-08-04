@@ -4,31 +4,22 @@ import {
   StyleSheet, 
   Text, 
   TextInput,
-  View, 
-  Picker 
+  View
 } from 'react-native'
 import { CheckBox } from 'react-native-elements'
 import produce from 'immer'
+import ErrorBoundary from './errorBoundary'
 import CustomInputList from './customInput'
 import Slotmachine from './slotmachine'
 import { findReactElement } from '../utils'
 import cogito from '../assets/cogito_loading.gif'
-
-/* const Link = props => (
-  <Text
-    {...props}
-    accessibilityRole="link"
-    style={[styles.link, props.style]}
-  />
-); */
 
 export default class App extends PureComponent {
   state = {
     selectedOption: 'custom',
     question: '',
     maxInputIndex: 1,
-    fromNum: undefined,
-    toNum: undefined,
+    numRange: ['', ''],
     items: [{
       placeholder: 'item 1',
       value: ''
@@ -38,25 +29,27 @@ export default class App extends PureComponent {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { items, items: { length: itemsLen }, selectedOption, fromNum, toNum } = this.state
-    const { items: { length: prevItemsLen }} = prevState
-    let { disabled } = this.state
+    const { items, items: { length: itemsLen }, numRange, numRange: [from, to] } = this.state
+    const { items: { length: prevItemsLen }, numRange: [prevFrom, prevTo]} = prevState
     if (itemsLen !== prevItemsLen) {
-      if (selectedOption === 'custom') {
-        disabled = items[0].value.trim() === ''
-      } else {
-        disabled = !fromNum || !toNum
-      }
-      this.setState({ disabled })
-    }    
+      this.setState({ disabled: items[0].value.trim() === '' })
+    }
+    if (from !== prevFrom || to !== prevTo) {
+      this.setState({ disabled: numRange.some(range => range === '') })
+    }  
   }
 
   handlePickerItemChange = e => {
-    const { placeholder: name, value } = e.currentTarget
+    const { items } = this.state
+    const { placeholder, value } = e.currentTarget
+    const inputIndex = items.findIndex(input => input.placeholder === placeholder)
+    if (inputIndex === items.length - 1) {
+      this.addInputItem(placeholder)
+    }
     this.setState(
       produce(draft => {
-        draft.items.forEach(({ placeholder }, i) => {
-          if (placeholder === name) {
+        draft.items.forEach((input, i) => {
+          if (input.placeholder === placeholder) {
             draft.items[i].value = value
           }
         })
@@ -74,19 +67,27 @@ export default class App extends PureComponent {
           draft.items.splice(inputIndex, 1)
         })
       )
-    } else if (String(value).trim() !== '' && inputIndex === items.length - 1) {
-      this.addInputItem(placeholder)
-    }
+    } 
   }
 
-  handleInputChange = e => { // question and fromNum, toNum
+  handleInputChange = e => { // question and numRange
     const re = new RegExp('^\\d*$', 'g')
-    const { name, value } = e.currentTarget;
-    let filteredValue = value
-    if (name.endsWith('Num') && !re.test(value)) {
-      filteredValue = this.state[name]    
-    }
-    this.setState({ [name]: filteredValue })
+    const { name, value } = e.currentTarget
+    this.setState(
+      produce(draft => {
+        if (name === 'from') {
+          if (re.test(value)) {
+            draft.numRange[0] = value
+          }
+        } else if (name === 'to') {
+          if (re.test(value)) {
+            draft.numRange[1] = value
+          }
+        } else {
+          draft[name] = value
+        }        
+      })
+    )
   }
   
   handleSelectType = e => {
@@ -121,8 +122,7 @@ export default class App extends PureComponent {
     const { 
       items, 
       selectedOption, 
-      fromNum, 
-      toNum, 
+      numRange,
       question, 
       answer,
       disabled 
@@ -154,88 +154,81 @@ export default class App extends PureComponent {
               placeholder="type your question here"
               placeholderTextColor="orange"
               onChange={this.handleInputChange}
-              value={question}
               multiline
+              value={question}
               style={styles.questionText}
             />
-          </View>        
-          <View style={styles.answerContainer}>
-            <Text style={styles.answerText}>
-              Answer
-            </Text>
-            <TextInput
-              editable={false}
-              value={answer}
-            />
-          </View>
-          <View style={styles.typeContainer}>
+          </View>    
+          {answer !== '' && (
+            <View style={styles.answerContainer}>
+              <Text style={styles.answerText}>
+                {answer}
+              </Text>
+            </View>
+          )}
+          <Text style={styles.text}>
+            Select Type
+          </Text>          
+          <View style={styles.selectTypeContainer}>
+          {['custom', 'numbers'].map(type => (
             <CheckBox
-              title="Custom"
-              name="custom"
+              key={type}
+              title={type}
+              name={type}
+              containerStyle={styles.selectTypeButtonStyle}
+              textStyle={styles.selectTypeTextStyle}
               checkedIcon="dot-circle-o"
               uncheckedIcon="circle-o"
-              checked={selectedOption === 'custom'}
+              checkedColor="#888"
+              checked={selectedOption === type}
               onPress={this.handleSelectType}
             />
-            <CheckBox
-              title="Numbers"
-              name="numbers"
-              checkedIcon="dot-circle-o"
-              uncheckedIcon="circle-o"
-              checked={selectedOption === 'numbers'}
-              onPress={this.handleSelectType}
-            />
+          ))}
           </View>
-          <View style={styles.inputListContainer}>
-            {selectedOption === 'custom' ? (
-              <Fragment>
-                <Text style={styles.inputListTitleText}>
-                  Type Custom Items
-                </Text>
-                <CustomInputList
-                  items={items}
-                  handlePickerItemChange={this.handlePickerItemChange}
-                  handlePickerItemBlur={this.handlePickerItemBlur}
-                />
-              </Fragment>
-            ) : (
-              <Fragment>
-                <Text style={styles.inputListTitleText}>
-                  Select Range of Numbers
-                </Text>
-                <TextInput
-                  name="fromNum"
-                  placeholder="Number from"
-                  onChange={this.handleInputChange}
-                  value={fromNum}
-                />
-                <TextInput
-                  name="toNum"
-                  placeholder="Number to"
-                  onChange={this.handleInputChange}
-                  vlue={toNum}
-                />
-              </Fragment>
-            )}
-          </View> 
+          <ErrorBoundary>
+            <View style={styles.inputListContainer}>
+              {selectedOption === 'custom' ? (
+                <Fragment>
+                  <Text style={styles.text}>
+                    Type Custom Items
+                  </Text>
+                  <CustomInputList
+                    items={items}
+                    handlePickerItemChange={this.handlePickerItemChange}
+                    handlePickerItemBlur={this.handlePickerItemBlur}
+                  />
+                </Fragment>
+              ) : (
+                <Fragment>
+                  <Text style={styles.text}>
+                    Select Range of Numbers
+                  </Text>
+                  {['from', 'to'].map((adverb, i) => (
+                    <View
+                      key={adverb}
+                      style={inputStyles.inputContainer}
+                    >
+                      <TextInput                      
+                        name={adverb}
+                        placeholder={`Number ${adverb}`}
+                        onChange={this.handleInputChange}
+                        value={numRange[i]}
+                        style={inputStyles.inputText}
+                      />
+                    </View>
+                  ))}
+                </Fragment>
+              )}
+            </View>
+          </ErrorBoundary>
           <Slotmachine
             option={selectedOption}
             items={items}
-            fromNum={fromNum}
-            toNum={toNum}
+            numRange={numRange}
             onSubmitClick={this.handleSubmit}
             disabled={disabled}
             answer={this.answerOn}
           />
-          {/* <Picker>
-            {items.map((item, i) =>(
-              <Picker.Item 
-                key={i}
-                label="label"
-                value="value"
-              />
-            ))}
-          </Picker>*/}
         </View>
       </View>
     );
@@ -258,35 +251,58 @@ const styles = StyleSheet.create({
     fontFamily: 'bungee, cursive',
     fontWeight: 'bold',
     fontSize: "1.5rem",
-    marginVertical: "1em",
+    margin: "1em",
     textAlign: "center",
     color: 'slategray'
   },
   mainContainer: {
     flex: 1,
-    padding: 20,
+    paddingHorizontal: 20,
   },
   questionContainer: {
     justifyContent: 'center',
-    // alignItems: 'center',
+    alignItems: 'center',
     borderWidth: 0,
+    height: 'auto'
   },
   questionText: {
     width: '100%',
-    minHeight: 68,
     wordWrap: 'break-word',
     justifyContent: 'center',
-    paddingVertical: '1rem',
+    alignSelf: 'center',
+    paddingTop: '2rem',
     lineHeight: '2rem',
     fontFamily: 'bungee, cursive',
     fontSize: '1.25rem',
     fontWeight: 'bold',
     outline: 'none',
-    textAlign: 'center'
+    textAlign: 'center',
+    textAlignVertical: 'center'
   },
-  typeContainer: {
+  answerContainer: {
+    marginTop: '1rem'
+  },
+  answerText: {
+    fontFamily: 'bungee, cursive',
+    fontSize: "0.85rem",
+    fontWeight: 'bold',
+    marginVertical: "0.3rem",
+    color: '#f08080',
+    textAlign: "center"   
+  },
+  selectTypeContainer: {
     flexDirection: 'row',
     justifyContent: 'center'
+  },
+  selectTypeButtonStyle: {
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+    borderWidth: 0
+  },
+  selectTypeTextStyle: {
+    fontFamily: 'bungee, cursive',
+    fontSize: "1rem",
+    textAlign: "center"    
   },
   text: {
     fontFamily: 'bungee, cursive',
@@ -296,6 +312,11 @@ const styles = StyleSheet.create({
     color: '#888',
     textAlign: "center"    
   },
+  inputListContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: '0.5rem',
+  },
   link: {
     color: "#1B95E0"
   },
@@ -303,3 +324,25 @@ const styles = StyleSheet.create({
     fontFamily: "monospace, monospace"
   }
 });
+
+export const inputStyles = StyleSheet.create({
+  inputContainer: {
+    width: 130,
+    height: 'auto',
+    borderWidth: 1,
+    borderRadius: 3,
+    borderColor: 'transparent',
+    shadowOffset: { width: -1, height: -1 },
+    shadowOpacity: 0.8,
+    shadowRadius: 5,
+    marginVertical: '0.125rem',
+    overflow: 'hidden'
+  },
+  inputText: {
+    paddingVertical: '0.25rem',
+    fontFamily: 'bungee, cursive',
+    lineHeight: "1rem",
+    fontSize: "0.7rem",
+    textAlign: "center"  
+  }
+})

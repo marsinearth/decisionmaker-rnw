@@ -1,90 +1,80 @@
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+  value: true
 });
-
-var _reactNative = require('react-native');
 
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var _crc = require("create-react-class");
+var _rmcDialog = require('rmc-dialog');
+
+var _rmcDialog2 = _interopRequireDefault(_rmcDialog);
 
 var _PopupMixin = require('./PopupMixin');
 
 var _PopupMixin2 = _interopRequireDefault(_PopupMixin);
 
-var _Modal = require('rc-dialog/lib/Modal');
+var _rmcFeedback = require('rmc-feedback');
 
-var _Modal2 = _interopRequireDefault(_Modal);
+var _rmcFeedback2 = _interopRequireDefault(_rmcFeedback);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var PopupPicker = _crc({
-    displayName: 'PopupPicker',
+var getModal = function getModal(props, visible, _ref) {
+  var getContent = _ref.getContent,
+      hide = _ref.hide,
+      onDismiss = _ref.onDismiss,
+      onOk = _ref.onOk;
 
-    mixins: [_PopupMixin2["default"]],
-    getDefaultProps: function getDefaultProps() {
-        return {
-            actionTextUnderlayColor: '#ddd',
-            actionTextActiveOpacity: 1,
-            triggerType: 'onPress',
-            styles: {},
-            WrapComponent: _reactNative.View
-        };
-    },
-    getModal: function getModal() {
-        var props = this.props;
-        var styles = props.styles,
-            title = props.title,
-            okText = props.okText,
-            dismissText = props.dismissText;
+  if (!visible) {
+    return null;
+  }
+  var prefixCls = props.prefixCls;
 
-        var titleEl = typeof title === 'string' ? _react2["default"].createElement(
-            _reactNative.Text,
-            { style: [styles.title] },
-            title
-        ) : title;
-        var okEl = typeof okText === 'string' ? _react2["default"].createElement(
-            _reactNative.Text,
-            { style: [styles.actionText] },
-            okText
-        ) : okText;
-        var dismissEl = typeof dismissText === 'string' ? _react2["default"].createElement(
-            _reactNative.Text,
-            { style: [styles.actionText] },
-            dismissText
-        ) : dismissText;
-        return _react2["default"].createElement(
-            _Modal2["default"],
-            { animationType: 'slide-up', wrapStyle: styles.modal, visible: this.state.visible, onClose: this.onDismiss },
-            _react2["default"].createElement(
-                _reactNative.View,
-                { style: [styles.header] },
-                _react2["default"].createElement(
-                    _reactNative.TouchableHighlight,
-                    { onPress: this.onDismiss, style: [styles.headerItem], activeOpacity: props.actionTextActiveOpacity, underlayColor: props.actionTextUnderlayColor },
-                    dismissEl
-                ),
-                _react2["default"].createElement(
-                    _reactNative.View,
-                    { style: [styles.headerItem] },
-                    titleEl
-                ),
-                _react2["default"].createElement(
-                    _reactNative.TouchableHighlight,
-                    { onPress: this.onOk, style: [styles.headerItem], activeOpacity: props.actionTextActiveOpacity, underlayColor: props.actionTextUnderlayColor },
-                    okEl
-                )
-            ),
-            this.getContent()
-        );
-    },
-    render: function render() {
-        return this.getRender();
-    }
+  return _react2['default'].createElement(
+    _rmcDialog2['default'],
+    { prefixCls: '' + prefixCls, className: props.className || '', visible: true, closable: false, transitionName: props.transitionName || props.popupTransitionName, maskTransitionName: props.maskTransitionName, onClose: hide, style: props.style },
+    _react2['default'].createElement(
+      'div',
+      null,
+      _react2['default'].createElement(
+        'div',
+        { className: prefixCls + '-header' },
+        _react2['default'].createElement(
+          _rmcFeedback2['default'],
+          { activeClassName: prefixCls + '-item-active' },
+          _react2['default'].createElement(
+            'div',
+            { className: prefixCls + '-item ' + prefixCls + '-header-left', onClick: onDismiss },
+            props.dismissText
+          )
+        ),
+        _react2['default'].createElement(
+          'div',
+          { className: prefixCls + '-item ' + prefixCls + '-title' },
+          props.title
+        ),
+        _react2['default'].createElement(
+          _rmcFeedback2['default'],
+          { activeClassName: prefixCls + '-item-active' },
+          _react2['default'].createElement(
+            'div',
+            { className: prefixCls + '-item ' + prefixCls + '-header-right', onClick: onOk },
+            props.okText
+          )
+        )
+      ),
+      getContent()
+    )
+  );
+};
+exports['default'] = (0, _PopupMixin2['default'])(getModal, {
+  prefixCls: 'rmc-picker-popup',
+  WrapComponent: 'span',
+  triggerType: 'onClick',
+  pickerValueProp: 'selectedValue',
+  pickerValueChangeProp: 'onValueChange'
 });
-exports["default"] = PopupPicker;
 module.exports = exports['default'];

@@ -46,7 +46,9 @@ online example: http://react-component.github.io/m-picker/
 ## react-native
 
 ```
-./node_modules/rc-tools run react-native-init
+npm run rn-init
+npm run watch-tsc
+react-native start
 react-native run-ios
 ```
 
@@ -55,10 +57,52 @@ react-native run-ios
 [![rmc-picker](https://nodei.co/npm/rmc-picker.png)](https://npmjs.org/package/rmc-picker)
 
 
+# 4.x beta docs
+
+> If you are looking for 3.x doc, please see [rmc-picker@3.x](https://github.com/react-component/m-picker/tree/3.x)
+
+
 ## Usage
-see example
+```jsx
+<MultiPicker
+  selectedValue={this.state.value}
+  onValueChange={this.onChange}
+>
+  <Picker indicatorClassName="my-picker-indicator">
+    <Picker.Item className="my-picker-view-item" value="1">one</Picker.Item>
+    <Picker.Item className="my-picker-view-item" value="2">two</Picker.Item>
+    <Picker.Item className="my-picker-view-item" value="3">three</Picker.Item>
+    <Picker.Item className="my-picker-view-item" value="4">four</Picker.Item>
+    <Picker.Item className="my-picker-view-item" value="5">five</Picker.Item>
+    <Picker.Item className="my-picker-view-item" value="6">six</Picker.Item>
+    <Picker.Item className="my-picker-view-item" value="7">seven</Picker.Item>
+    <Picker.Item className="my-picker-view-item" value="8">eight</Picker.Item>
+  </Picker>
+  <Picker indicatorClassName="my-picker-indicator">
+    <Picker.Item className="my-picker-view-item" value="11">eleven</Picker.Item>
+    <Picker.Item className="my-picker-view-item" value="12">twelve</Picker.Item>
+    <Picker.Item className="my-picker-view-item" value="13">thirteen</Picker.Item>
+    <Picker.Item className="my-picker-view-item" value="14">fourteen</Picker.Item>
+    <Picker.Item className="my-picker-view-item" value="15">fifteen</Picker.Item>
+    <Picker.Item className="my-picker-view-item" value="16">sixteen</Picker.Item>
+    <Picker.Item className="my-picker-view-item" value="17">seventeen</Picker.Item>
+    <Picker.Item className="my-picker-view-item" value="18">eighteen</Picker.Item>
+  </Picker>
+</MultiPicker>
+```
 
 ## API
+
+### MultiPicker props
+
+| name     | description    | type     | default      |
+|----------|----------------|----------|--------------|
+|className(web) | additional css class of root dom node | String |  |
+|prefixCls(web) | prefix class | String | '' |
+|defaultSelectedValue(web) | default selected values | string[]/number[] |  |
+|selectedValue | current selected values | string[]/number[] |  |
+|onValueChange | fire when picker change | Function(value) |  |
+
 
 ### Picker props
 
@@ -66,14 +110,18 @@ see example
 |----------|----------------|----------|--------------|
 |className(web) | additional css class of root dom node | String |  |
 |prefixCls(web) | prefix class | String | '' |
-|itemStyle     | Style to apply to each of the item. | object |
-|defaultSelectedValue(web) | default selected values corresponding to the input data above | string/number |  |
-|selectedValue | current selected values corresponding to the input data above | string/number |  |
+|defaultSelectedValue(web) | default selected values | string/number |  |
+|selectedValue | current selected values | string/number |  |
 |onValueChange | fire when picker change | Function(value) |  |
-|children      | array of picker items | [{label, value}] |
-|pure      | whether children is immutable | bool | true
 |disabled     | whether picker is disabled | bool | false
+|indicatorClassName     | className of indicator | String |
+|indicatorStyle     | style of indicator | object |
 
+### Picker.Item props
+| name     | description    | type     | default      |
+|----------|----------------|----------|--------------|
+|className(web) | additional css class of root dom node | String |  |
+|value | value of item | String |  |
 
 ## Test Case
 

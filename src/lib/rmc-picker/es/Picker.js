@@ -1,54 +1,20 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _defineProperty2 = require('babel-runtime/helpers/defineProperty');
-
-var _defineProperty3 = _interopRequireDefault(_defineProperty2);
-
-var _extends2 = require('babel-runtime/helpers/extends');
-
-var _extends3 = _interopRequireDefault(_extends2);
-
-var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
-
-var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
-var _createClass2 = require('babel-runtime/helpers/createClass');
-
-var _createClass3 = _interopRequireDefault(_createClass2);
-
-var _possibleConstructorReturn2 = require('babel-runtime/helpers/possibleConstructorReturn');
-
-var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
-
-var _inherits2 = require('babel-runtime/helpers/inherits');
-
-var _inherits3 = _interopRequireDefault(_inherits2);
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _classnames = require('classnames');
-
-var _classnames2 = _interopRequireDefault(_classnames);
-
-var _PickerMixin = require('./PickerMixin');
-
-var _PickerMixin2 = _interopRequireDefault(_PickerMixin);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+import _defineProperty from 'babel-runtime/helpers/defineProperty';
+import _extends from 'babel-runtime/helpers/extends';
+import _classCallCheck from 'babel-runtime/helpers/classCallCheck';
+import _createClass from 'babel-runtime/helpers/createClass';
+import _possibleConstructorReturn from 'babel-runtime/helpers/possibleConstructorReturn';
+import _inherits from 'babel-runtime/helpers/inherits';
+import React from 'react';
+import classNames from 'classnames';
+import PickerMixin from './PickerMixin';
 
 var Picker = function (_React$Component) {
-    (0, _inherits3['default'])(Picker, _React$Component);
+    _inherits(Picker, _React$Component);
 
     function Picker(props) {
-        (0, _classCallCheck3['default'])(this, Picker);
+        _classCallCheck(this, Picker);
 
-        var _this = (0, _possibleConstructorReturn3['default'])(this, (Picker.__proto__ || Object.getPrototypeOf(Picker)).call(this, props));
+        var _this = _possibleConstructorReturn(this, (Picker.__proto__ || Object.getPrototypeOf(Picker)).call(this, props));
 
         _this.scrollHanders = function () {
             var scrollY = -1;
@@ -201,7 +167,7 @@ var Picker = function (_React$Component) {
         _this.onScrollChange = function () {
             var top = _this.scrollHanders.getValue();
             if (top >= 0) {
-                var children = _react2['default'].Children.toArray(_this.props.children);
+                var children = React.Children.toArray(_this.props.children);
                 var index = _this.props.computeChildIndex(top, _this.itemHeight, children.length);
                 if (_this.scrollValue !== index) {
                     _this.scrollValue = index;
@@ -230,7 +196,7 @@ var Picker = function (_React$Component) {
         } else if (defaultSelectedValue !== undefined) {
             selectedValueState = defaultSelectedValue;
         } else {
-            var children = _react2['default'].Children.toArray(_this.props.children);
+            var children = React.Children.toArray(_this.props.children);
             selectedValueState = children && children[0] && children[0].props.value;
         }
         _this.state = {
@@ -239,7 +205,7 @@ var Picker = function (_React$Component) {
         return _this;
     }
 
-    (0, _createClass3['default'])(Picker, [{
+    _createClass(Picker, [{
         key: 'componentDidMount',
         value: function componentDidMount() {
             var _this2 = this;
@@ -330,7 +296,7 @@ var Picker = function (_React$Component) {
             if ('selectedValue' in this.props) {
                 return this.props.selectedValue;
             }
-            var children = _react2['default'].Children.toArray(this.props.children);
+            var children = React.Children.toArray(this.props.children);
             return children && children[0] && children[0].props.value;
         }
     }, {
@@ -357,27 +323,27 @@ var Picker = function (_React$Component) {
                     style = _item$props.style,
                     value = _item$props.value;
 
-                return _react2['default'].createElement(
+                return React.createElement(
                     'div',
-                    { style: (0, _extends3['default'])({}, itemStyle, style), className: (selectedValue === value ? selectedItemClassName : itemClassName) + ' ' + className, key: value },
+                    { style: _extends({}, itemStyle, style), className: (selectedValue === value ? selectedItemClassName : itemClassName) + ' ' + className, key: value },
                     item.children || item.props.children
                 );
             };
             // compatibility for preact
-            var items = _react2['default'].Children ? _react2['default'].Children.map(children, map) : [].concat(children).map(map);
-            var pickerCls = (_pickerCls = {}, (0, _defineProperty3['default'])(_pickerCls, props.className, !!props.className), (0, _defineProperty3['default'])(_pickerCls, prefixCls, true), _pickerCls);
-            return _react2['default'].createElement(
+            var items = React.Children ? React.Children.map(children, map) : [].concat(children).map(map);
+            var pickerCls = (_pickerCls = {}, _defineProperty(_pickerCls, props.className, !!props.className), _defineProperty(_pickerCls, prefixCls, true), _pickerCls);
+            return React.createElement(
                 'div',
-                { className: (0, _classnames2['default'])(pickerCls), ref: function ref(el) {
+                { className: classNames(pickerCls), ref: function ref(el) {
                         return _this5.rootRef = el;
                     }, style: this.props.style },
-                _react2['default'].createElement('div', { className: prefixCls + '-mask', ref: function ref(el) {
+                React.createElement('div', { className: prefixCls + '-mask', ref: function ref(el) {
                         return _this5.maskRef = el;
                     } }),
-                _react2['default'].createElement('div', { className: prefixCls + '-indicator ' + indicatorClassName, ref: function ref(el) {
+                React.createElement('div', { className: prefixCls + '-indicator ' + indicatorClassName, ref: function ref(el) {
                         return _this5.indicatorRef = el;
                     }, style: indicatorStyle }),
-                _react2['default'].createElement(
+                React.createElement(
                     'div',
                     { className: prefixCls + '-content', ref: function ref(el) {
                             return _this5.contentRef = el;
@@ -387,11 +353,11 @@ var Picker = function (_React$Component) {
             );
         }
     }]);
+
     return Picker;
-}(_react2['default'].Component);
+}(React.Component);
 
 Picker.defaultProps = {
     prefixCls: 'rmc-picker'
 };
-exports['default'] = (0, _PickerMixin2['default'])(Picker);
-module.exports = exports['default'];
+export default PickerMixin(Picker);

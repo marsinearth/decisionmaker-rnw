@@ -1,23 +1,11 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _extends2 = require('babel-runtime/helpers/extends');
-
-var _extends3 = _interopRequireDefault(_extends2);
-
-var _reactNative = require('react-native');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
+import _extends from 'babel-runtime/helpers/extends';
+import { StyleSheet } from 'react-native';
 var textStyle = {
     color: '#0ae',
     fontSize: 18,
     textAlign: 'center'
 };
-var styles = _reactNative.StyleSheet.create({
+var styles = StyleSheet.create({
     modal: {
         flexDirection: 'column',
         justifyContent: 'flex-end'
@@ -40,7 +28,6 @@ var styles = _reactNative.StyleSheet.create({
     actionText: textStyle,
     okText: {},
     dismissText: {},
-    title: (0, _extends3['default'])({}, textStyle, { color: '#666' })
+    title: _extends({}, textStyle, { color: '#666' })
 });
-exports['default'] = styles;
-module.exports = exports['default'];
+export default styles;

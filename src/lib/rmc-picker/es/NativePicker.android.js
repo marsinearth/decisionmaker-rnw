@@ -1,39 +1,12 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
-
-var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
-var _createClass2 = require('babel-runtime/helpers/createClass');
-
-var _createClass3 = _interopRequireDefault(_createClass2);
-
-var _possibleConstructorReturn2 = require('babel-runtime/helpers/possibleConstructorReturn');
-
-var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
-
-var _inherits2 = require('babel-runtime/helpers/inherits');
-
-var _inherits3 = _interopRequireDefault(_inherits2);
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactNative = require('react-native');
-
-var _PickerMixin = require('./PickerMixin');
-
-var _PickerMixin2 = _interopRequireDefault(_PickerMixin);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-var ratio = _reactNative.PixelRatio.get();
-var styles = _reactNative.StyleSheet.create({
+import _classCallCheck from 'babel-runtime/helpers/classCallCheck';
+import _createClass from 'babel-runtime/helpers/createClass';
+import _possibleConstructorReturn from 'babel-runtime/helpers/possibleConstructorReturn';
+import _inherits from 'babel-runtime/helpers/inherits';
+import React from 'react';
+import { ScrollView, View, StyleSheet, PixelRatio, Text } from 'react-native';
+import PickerMixin from './PickerMixin';
+var ratio = PixelRatio.get();
+var styles = StyleSheet.create({
     indicator: {
         position: 'absolute',
         left: 0,
@@ -58,12 +31,12 @@ var styles = _reactNative.StyleSheet.create({
 });
 
 var Picker = function (_React$Component) {
-    (0, _inherits3['default'])(Picker, _React$Component);
+    _inherits(Picker, _React$Component);
 
     function Picker() {
-        (0, _classCallCheck3['default'])(this, Picker);
+        _classCallCheck(this, Picker);
 
-        var _this = (0, _possibleConstructorReturn3['default'])(this, (Picker.__proto__ || Object.getPrototypeOf(Picker)).apply(this, arguments));
+        var _this = _possibleConstructorReturn(this, (Picker.__proto__ || Object.getPrototypeOf(Picker)).apply(this, arguments));
 
         _this.onItemLayout = function (e) {
             var _e$nativeEvent$layout = e.nativeEvent.layout,
@@ -131,7 +104,7 @@ var Picker = function (_React$Component) {
         return _this;
     }
 
-    (0, _createClass3['default'])(Picker, [{
+    _createClass(Picker, [{
         key: 'componentDidUpdate',
         value: function componentDidUpdate() {
             this.props.select(this.props.selectedValue, this.itemHeight, this.scrollTo);
@@ -159,37 +132,37 @@ var Picker = function (_React$Component) {
                 selectedValue = _props.selectedValue,
                 style = _props.style;
 
-            var items = _react2['default'].Children.map(children, function (item, index) {
+            var items = React.Children.map(children, function (item, index) {
                 var totalStyle = [styles.itemText];
                 if (selectedValue === item.props.value) {
                     totalStyle.push(styles.selectedItemText);
                 }
                 totalStyle.push(itemStyle);
-                return _react2['default'].createElement(
-                    _reactNative.View,
+                return React.createElement(
+                    View,
                     { ref: function ref(el) {
                             return _this2['item' + index] = el;
                         }, onLayout: index === 0 ? _this2.onItemLayout : undefined, key: item.key },
-                    _react2['default'].createElement(
-                        _reactNative.Text,
+                    React.createElement(
+                        Text,
                         { style: totalStyle, numberOfLines: 1 },
                         item.props.label
                     )
                 );
             });
-            return _react2['default'].createElement(
-                _reactNative.View,
+            return React.createElement(
+                View,
                 { style: style },
-                _react2['default'].createElement(_reactNative.View, { ref: function ref(el) {
+                React.createElement(View, { ref: function ref(el) {
                         return _this2.indicatorRef = el;
                     }, style: styles.indicator }),
-                _react2['default'].createElement(
-                    _reactNative.ScrollView,
+                React.createElement(
+                    ScrollView,
                     { style: styles.scrollView, ref: function ref(el) {
                             return _this2.scrollerRef = el;
                         }, onScroll: this.onScroll, showsVerticalScrollIndicator: false, overScrollMode: 'never' },
-                    _react2['default'].createElement(
-                        _reactNative.View,
+                    React.createElement(
+                        View,
                         { ref: function ref(el) {
                                 return _this2.contentRef = el;
                             } },
@@ -199,8 +172,8 @@ var Picker = function (_React$Component) {
             );
         }
     }]);
-    return Picker;
-}(_react2['default'].Component);
 
-exports['default'] = (0, _PickerMixin2['default'])(Picker);
-module.exports = exports['default'];
+    return Picker;
+}(React.Component);
+
+export default PickerMixin(Picker);

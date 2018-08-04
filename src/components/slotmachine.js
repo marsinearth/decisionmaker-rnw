@@ -1,42 +1,49 @@
 import React, { PureComponent } from 'react'
-import Picker from 'rmc-picker/lib/Picker.web'
-import Popup from 'rmc-picker/lib/Popup.web'
-import InfiniteScroll from 'react-infinite-scroller'
+import { View, Text, TouchableHighlight, ScrollView, StyleSheet } from 'react-native'
+import Picker from 'rmc-picker/es/Picker'
+import Popup from 'rmc-picker/es/Popup'
+import 'rmc-picker/assets/index.css'
+import 'rmc-picker/assets/popup.css'
+// import InfiniteScroll from 'react-infinite-scroller'
 import produce from 'immer'
 
-const generateArray = ({ data, startIdx, endIdx, limit }) => {
+const generateArray = async ({ data, startIdx, endIdx, limit }) => {
   let init = 0
   const array = []
   for (let j = 0; j < limit; j++) {
     for (
       let i = startIdx;
-      endIdx >= startIdx ? i < endIdx : i > endIdx;
+      endIdx >= startIdx ? i <= endIdx : i > endIdx;
       endIdx >= startIdx ? i++ : i--
     ) {
       array.push({
-        label: String(data[i]),
-        value: String(init++)
+        label: init,
+        datum: data[i]
       });
+      init++
     }
   }
   return array
 }
 
-class InfinitePicker extends PureComponent {
-  render() {
-    const { items } = this.props
-    return (
-      <Picker>
-        {items}
-      </Picker>
-    )
-  }
-}
+const PickerComp = ({ items, value, onChangeValue }) => (
+  <Picker
+    selectedValue={value}
+    onValueChange={onChangeValue}
+  >
+    {items.map(({ label, datum }) => (
+      <Picker.Item key={label} value={label}>
+        {datum}
+      </Picker.Item>
+    ))
+    }
+  </Picker>
+)
 
 export default class Slotmachine extends PureComponent {
   state = {
     items: [],
-    value: '',
+    value: 0,
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -47,20 +54,21 @@ export default class Slotmachine extends PureComponent {
     }
   }
 
-  onReady = () => {
+  onReady = async () => {
     const { num, ...processedData } = this.dataPrepare()
-    console.log('num: ', num)
-    const generatedItems = generateArray({...processedData})
+    const generatedItems = await generateArray({...processedData})
     const itemsLength = generatedItems.length
-    const value = this.calibrateValue(itemsLength, num)
-    this.setState({ items: generatedItems, value })
+    const value = await this.calibrateValue(itemsLength, num)
+    this.setState({ value, items: generatedItems })
+  }
+  onOk = () => {
+    const { items, value } = this.state
+    const selectedValue = items[value].datum
+    this.props.answer(selectedValue)
   }
 
-  onOK = value => {
-    const item = this.state.items[value]
-    this.setState({ value }, () => {
-      this.props.answer(item['label'])
-    })
+  onChangeValue = value => {
+    this.setState({ value })
   }
 
   onLoadMore = () => {
@@ -76,25 +84,29 @@ export default class Slotmachine extends PureComponent {
     )
   }
 
-  calibrateValue = (dataLength, num) => {
+  calibrateValue = async (dataLength, num) => {
     const comp = Math.floor(Math.floor(dataLength / num) * num / 2)
-    return String(comp - comp % num)
+    return comp - comp % num
   }
 
   dataPrepare = () => {
-    const { option, items, toNum, fromNum } = this.props
+    const { option, items, numRange: [from, to] } = this.props
     let data, num, startIdx, endIdx, limit
     if (option === 'custom') {
-      data = items.map(item => item.value)
-      num = data.length
+      data = items.slice(0, -1).map(item => item.value)
+      num = data.length - 1
       startIdx = 0
       endIdx = num
       limit = Math.floor(1000 / num)
     } else {
-      num = Math.abs(toNum - fromNum) + 1
-      startIdx = fromNum
-      endIdx = toNum
-      limit = Math.floor(1000 / Math.abs(endIdx - startIdx))
+      num = Math.abs(to - from) + 1
+      startIdx = from
+      endIdx = to
+      if (endIdx === startIdx) {
+        limit = 1000
+      } else {
+        limit = Math.floor(1000 / Math.abs(endIdx - startIdx))
+      }    
       data = Array.from(Array(limit).keys())
     }
     const returnObj = { data, startIdx, endIdx, limit, num }
@@ -105,22 +117,63 @@ export default class Slotmachine extends PureComponent {
     const { disabled } = this.props
     const { items, value } = this.state
     return (
-      <div>
-        <Popup
-          className="fortest"
-          transitionName="rmc-picker-popup-slide-fade"
-          maskTransitionName="rmc-picker-popup-fade"
-          picker={<Picker>{items}</Picker>}
-          title="Roll & Pick!!!"
-          value={value}
-          onOk={this.onOK}
-          disabled={disabled}
-        >
-          <button disabled={disabled} onClick={this.onReady}>
-            {'Ready'}
-          </button>
-        </Popup>
-      </div>
+      <ScrollView>
+        <View style={styles.container}>
+          <Popup
+            className="fortest"
+            transitionName="rmc-picker-popup-slide-fade"
+            maskTransitionName="rmc-picker-popup-fade"
+            maskClosable={false}
+            content={
+              <PickerComp
+                items={items}
+                value={value}
+                onChangeValue={this.onChangeValue}
+              />
+            }
+            title="Roll & Pick!!!"
+            value={value}
+            onOk={this.onOk}
+            disabled={disabled}
+          >
+            <TouchableHighlight
+              activeOpacity={0.5} 
+              underlayColor="#a9d9d4"
+              disabled={disabled} 
+              onPress={this.onReady}
+            >
+              <View style={styles.readyBtnContainer}>
+                <Text style={[styles.readyBtnText, { color: disabled ? '#888' : 'black' }]}>
+                  {'Ready'}
+                </Text>
+              </View>
+            </TouchableHighlight>
+          </Popup>
+        </View>
+      </ScrollView>
     )
   }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  readyBtnContainer: {
+    width: 60,
+    borderRadius: 3,
+    borderWidth: 1,
+    borderColor: '#999',
+    paddingVertical: '0.25rem',
+    cursor: 'pointer',
+    outline: 'none'
+  },
+  readyBtnText: {
+    fontFamily: 'bungee, cursive',
+    lineHeight: "1rem",
+    fontSize: "0.7rem",
+    textAlign: "center"  
+  }
+})
