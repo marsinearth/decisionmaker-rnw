@@ -7,13 +7,13 @@ import 'rmc-picker/assets/popup.css'
 // import InfiniteScroll from 'react-infinite-scroller'
 import produce from 'immer'
 
-const generateArray = async ({ data, startIdx, endIdx, limit }) => {
+const generateArray = async ({ data, startIdx, endIdx, limit, num }) => {
   let init = 0
   const array = []
-  for (let j = 0; j < limit; j++) {
+  for (let j = 0; j <= limit; j++) {
     for (
-      let i = startIdx;
-      endIdx >= startIdx ? i <= endIdx : i > endIdx;
+      let i = endIdx >= startIdx ? 0 : num;
+      endIdx >= startIdx ? i <= num : i > 0;
       endIdx >= startIdx ? i++ : i--
     ) {
       array.push({
@@ -55,10 +55,10 @@ export default class Slotmachine extends PureComponent {
   }
 
   onReady = async () => {
-    const { num, ...processedData } = this.dataPrepare()
-    const generatedItems = await generateArray({...processedData})
+    const processedData = this.dataPrepare()
+    const generatedItems = await generateArray(processedData)
     const itemsLength = generatedItems.length
-    const value = await this.calibrateValue(itemsLength, num)
+    const value = await this.calibrateValue(itemsLength, processedData.num)
     this.setState({ value, items: generatedItems })
   }
   onOk = () => {
@@ -85,8 +85,14 @@ export default class Slotmachine extends PureComponent {
   }
 
   calibrateValue = async (dataLength, num) => {
-    const comp = Math.floor(Math.floor(dataLength / num) * num / 2)
-    return comp - comp % num
+    let calcNum;
+    if (num === 0) {
+      calcNum = 1
+    } else {
+      calcNum = num
+    }
+    const comp = Math.floor(Math.floor(dataLength / calcNum) * calcNum / 2)
+    return comp - comp % calcNum
   }
 
   dataPrepare = () => {
@@ -97,20 +103,22 @@ export default class Slotmachine extends PureComponent {
       num = data.length - 1
       startIdx = 0
       endIdx = num
-      limit = Math.floor(1000 / num)
+      limit = num === 0 ? 1000 : Math.floor(1000 / num)
     } else {
       num = Math.abs(to - from) + 1
-      startIdx = from
-      endIdx = to
+      startIdx = Number(from)
+      endIdx = Number(to)
       if (endIdx === startIdx) {
         limit = 1000
       } else {
         limit = Math.floor(1000 / Math.abs(endIdx - startIdx))
       }    
-      data = Array.from(Array(limit).keys())
+      data = [...Array(endIdx + 1).keys()].filter(key => (
+        ![...Array(startIdx + 1).keys()].includes(key)
+      ))
+      console.log('data: ', data);
     }
-    const returnObj = { data, startIdx, endIdx, limit, num }
-    return returnObj
+    return { data, startIdx, endIdx, limit, num }
   }
 
   render() {

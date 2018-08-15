@@ -99,12 +99,13 @@ export default class App extends PureComponent {
 
   addInputItem = placeholder => {
     let { maxInputIndex } = this.state
-    const itemIndex = Number(placeholder.slice(-1))
+    const placeHolderArray = placeholder.split(' ')
+    const itemIndex = Number(placeHolderArray[1])
     if (itemIndex > maxInputIndex) {
-      maxInputIndex = itemIndex
+      maxInputIndex = Number(itemIndex)
     }
     const newItem = {
-      placeholder: `item ${++maxInputIndex}`,
+      placeholder: `item ${maxInputIndex + 1}`,
       value: ''
     }
     this.setState(

@@ -1,61 +1,21 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _extends2 = require('babel-runtime/helpers/extends');
-
-var _extends3 = _interopRequireDefault(_extends2);
-
-var _defineProperty2 = require('babel-runtime/helpers/defineProperty');
-
-var _defineProperty3 = _interopRequireDefault(_defineProperty2);
-
-var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
-
-var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
-var _createClass2 = require('babel-runtime/helpers/createClass');
-
-var _createClass3 = _interopRequireDefault(_createClass2);
-
-var _possibleConstructorReturn2 = require('babel-runtime/helpers/possibleConstructorReturn');
-
-var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
-
-var _inherits2 = require('babel-runtime/helpers/inherits');
-
-var _inherits3 = _interopRequireDefault(_inherits2);
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _propTypes = require('prop-types');
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
-var _ChildrenUtils = require('./ChildrenUtils');
-
-var _AnimateChild = require('./AnimateChild');
-
-var _AnimateChild2 = _interopRequireDefault(_AnimateChild);
-
-var _util = require('./util');
-
-var _util2 = _interopRequireDefault(_util);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
+import _extends from 'babel-runtime/helpers/extends';
+import _defineProperty from 'babel-runtime/helpers/defineProperty';
+import _classCallCheck from 'babel-runtime/helpers/classCallCheck';
+import _createClass from 'babel-runtime/helpers/createClass';
+import _possibleConstructorReturn from 'babel-runtime/helpers/possibleConstructorReturn';
+import _inherits from 'babel-runtime/helpers/inherits';
+import React from 'react';
+import PropTypes from 'prop-types';
+import { toArrayChildren, mergeChildren, findShownChildInChildrenByKey, findChildInChildrenByKey, isSameChildren } from './ChildrenUtils';
+import AnimateChild from './AnimateChild';
 var defaultKey = 'rc_animate_' + Date.now();
-
+import animUtil from './util';
 
 function getChildrenFromProps(props) {
   var children = props.children;
-  if (_react2['default'].isValidElement(children)) {
+  if (React.isValidElement(children)) {
     if (!children.key) {
-      return _react2['default'].cloneElement(children, {
+      return React.cloneElement(children, {
         key: defaultKey
       });
     }
@@ -66,14 +26,14 @@ function getChildrenFromProps(props) {
 function noop() {}
 
 var Animate = function (_React$Component) {
-  (0, _inherits3['default'])(Animate, _React$Component);
+  _inherits(Animate, _React$Component);
 
   // eslint-disable-line
 
   function Animate(props) {
-    (0, _classCallCheck3['default'])(this, Animate);
+    _classCallCheck(this, Animate);
 
-    var _this = (0, _possibleConstructorReturn3['default'])(this, (Animate.__proto__ || Object.getPrototypeOf(Animate)).call(this, props));
+    var _this = _possibleConstructorReturn(this, (Animate.__proto__ || Object.getPrototypeOf(Animate)).call(this, props));
 
     _initialiseProps.call(_this);
 
@@ -82,14 +42,14 @@ var Animate = function (_React$Component) {
     _this.keysToLeave = [];
 
     _this.state = {
-      children: (0, _ChildrenUtils.toArrayChildren)(getChildrenFromProps(props))
+      children: toArrayChildren(getChildrenFromProps(props))
     };
 
     _this.childrenRefs = {};
     return _this;
   }
 
-  (0, _createClass3['default'])(Animate, [{
+  _createClass(Animate, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
       var _this2 = this;
@@ -113,7 +73,7 @@ var Animate = function (_React$Component) {
       var _this3 = this;
 
       this.nextProps = nextProps;
-      var nextChildren = (0, _ChildrenUtils.toArrayChildren)(getChildrenFromProps(nextProps));
+      var nextChildren = toArrayChildren(getChildrenFromProps(nextProps));
       var props = this.props;
       // exclusive needs immediate response
       if (props.exclusive) {
@@ -124,15 +84,15 @@ var Animate = function (_React$Component) {
       var showProp = props.showProp;
       var currentlyAnimatingKeys = this.currentlyAnimatingKeys;
       // last props children if exclusive
-      var currentChildren = props.exclusive ? (0, _ChildrenUtils.toArrayChildren)(getChildrenFromProps(props)) : this.state.children;
+      var currentChildren = props.exclusive ? toArrayChildren(getChildrenFromProps(props)) : this.state.children;
       // in case destroy in showProp mode
       var newChildren = [];
       if (showProp) {
         currentChildren.forEach(function (currentChild) {
-          var nextChild = currentChild && (0, _ChildrenUtils.findChildInChildrenByKey)(nextChildren, currentChild.key);
+          var nextChild = currentChild && findChildInChildrenByKey(nextChildren, currentChild.key);
           var newChild = void 0;
           if ((!nextChild || !nextChild.props[showProp]) && currentChild.props[showProp]) {
-            newChild = _react2['default'].cloneElement(nextChild || currentChild, (0, _defineProperty3['default'])({}, showProp, true));
+            newChild = React.cloneElement(nextChild || currentChild, _defineProperty({}, showProp, true));
           } else {
             newChild = nextChild;
           }
@@ -141,12 +101,12 @@ var Animate = function (_React$Component) {
           }
         });
         nextChildren.forEach(function (nextChild) {
-          if (!nextChild || !(0, _ChildrenUtils.findChildInChildrenByKey)(currentChildren, nextChild.key)) {
+          if (!nextChild || !findChildInChildrenByKey(currentChildren, nextChild.key)) {
             newChildren.push(nextChild);
           }
         });
       } else {
-        newChildren = (0, _ChildrenUtils.mergeChildren)(currentChildren, nextChildren);
+        newChildren = mergeChildren(currentChildren, nextChildren);
       }
 
       // need render to avoid update
@@ -159,11 +119,11 @@ var Animate = function (_React$Component) {
         if (child && currentlyAnimatingKeys[key]) {
           return;
         }
-        var hasPrev = child && (0, _ChildrenUtils.findChildInChildrenByKey)(currentChildren, key);
+        var hasPrev = child && findChildInChildrenByKey(currentChildren, key);
         if (showProp) {
           var showInNext = child.props[showProp];
           if (hasPrev) {
-            var showInNow = (0, _ChildrenUtils.findShownChildInChildrenByKey)(currentChildren, key, showProp);
+            var showInNow = findShownChildInChildrenByKey(currentChildren, key, showProp);
             if (!showInNow && showInNext) {
               _this3.keysToEnter.push(key);
             }
@@ -180,11 +140,11 @@ var Animate = function (_React$Component) {
         if (child && currentlyAnimatingKeys[key]) {
           return;
         }
-        var hasNext = child && (0, _ChildrenUtils.findChildInChildrenByKey)(nextChildren, key);
+        var hasNext = child && findChildInChildrenByKey(nextChildren, key);
         if (showProp) {
           var showInNow = child.props[showProp];
           if (hasNext) {
-            var showInNext = (0, _ChildrenUtils.findShownChildInChildrenByKey)(nextChildren, key, showProp);
+            var showInNext = findShownChildInChildrenByKey(nextChildren, key, showProp);
             if (!showInNext && showInNow) {
               _this3.keysToLeave.push(key);
             }
@@ -211,9 +171,9 @@ var Animate = function (_React$Component) {
     value: function isValidChildByKey(currentChildren, key) {
       var showProp = this.props.showProp;
       if (showProp) {
-        return (0, _ChildrenUtils.findShownChildInChildrenByKey)(currentChildren, key, showProp);
+        return findShownChildInChildrenByKey(currentChildren, key, showProp);
       }
-      return (0, _ChildrenUtils.findChildInChildrenByKey)(currentChildren, key);
+      return findChildInChildrenByKey(currentChildren, key);
     }
   }, {
     key: 'stop',
@@ -241,8 +201,8 @@ var Animate = function (_React$Component) {
           if (!child.key) {
             throw new Error('must set key for <rc-animate> children');
           }
-          return _react2['default'].createElement(
-            _AnimateChild2['default'],
+          return React.createElement(
+            AnimateChild,
             {
               key: child.key,
               ref: function ref(node) {
@@ -262,12 +222,12 @@ var Animate = function (_React$Component) {
       if (Component) {
         var passedProps = props;
         if (typeof Component === 'string') {
-          passedProps = (0, _extends3['default'])({
+          passedProps = _extends({
             className: props.className,
             style: props.style
           }, props.componentProps);
         }
-        return _react2['default'].createElement(
+        return React.createElement(
           Component,
           passedProps,
           children
@@ -276,24 +236,25 @@ var Animate = function (_React$Component) {
       return children[0] || null;
     }
   }]);
+
   return Animate;
-}(_react2['default'].Component);
+}(React.Component);
 
 Animate.isAnimate = true;
 Animate.propTypes = {
-  component: _propTypes2['default'].any,
-  componentProps: _propTypes2['default'].object,
-  animation: _propTypes2['default'].object,
-  transitionName: _propTypes2['default'].oneOfType([_propTypes2['default'].string, _propTypes2['default'].object]),
-  transitionEnter: _propTypes2['default'].bool,
-  transitionAppear: _propTypes2['default'].bool,
-  exclusive: _propTypes2['default'].bool,
-  transitionLeave: _propTypes2['default'].bool,
-  onEnd: _propTypes2['default'].func,
-  onEnter: _propTypes2['default'].func,
-  onLeave: _propTypes2['default'].func,
-  onAppear: _propTypes2['default'].func,
-  showProp: _propTypes2['default'].string
+  component: PropTypes.any,
+  componentProps: PropTypes.object,
+  animation: PropTypes.object,
+  transitionName: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  transitionEnter: PropTypes.bool,
+  transitionAppear: PropTypes.bool,
+  exclusive: PropTypes.bool,
+  transitionLeave: PropTypes.bool,
+  onEnd: PropTypes.func,
+  onEnter: PropTypes.func,
+  onLeave: PropTypes.func,
+  onAppear: PropTypes.func,
+  showProp: PropTypes.string
 };
 Animate.defaultProps = {
   animation: {},
@@ -333,18 +294,18 @@ var _initialiseProps = function _initialiseProps() {
     if (props.exclusive && props !== _this5.nextProps) {
       return;
     }
-    var currentChildren = (0, _ChildrenUtils.toArrayChildren)(getChildrenFromProps(props));
+    var currentChildren = toArrayChildren(getChildrenFromProps(props));
     if (!_this5.isValidChildByKey(currentChildren, key)) {
       // exclusive will not need this
       _this5.performLeave(key);
     } else {
       if (type === 'appear') {
-        if (_util2['default'].allowAppearCallback(props)) {
+        if (animUtil.allowAppearCallback(props)) {
           props.onAppear(key);
           props.onEnd(key, true);
         }
       } else {
-        if (_util2['default'].allowEnterCallback(props)) {
+        if (animUtil.allowEnterCallback(props)) {
           props.onEnter(key);
           props.onEnd(key, true);
         }
@@ -367,18 +328,18 @@ var _initialiseProps = function _initialiseProps() {
     if (props.exclusive && props !== _this5.nextProps) {
       return;
     }
-    var currentChildren = (0, _ChildrenUtils.toArrayChildren)(getChildrenFromProps(props));
+    var currentChildren = toArrayChildren(getChildrenFromProps(props));
     // in case state change is too fast
     if (_this5.isValidChildByKey(currentChildren, key)) {
       _this5.performEnter(key);
     } else {
       var end = function end() {
-        if (_util2['default'].allowLeaveCallback(props)) {
+        if (animUtil.allowLeaveCallback(props)) {
           props.onLeave(key);
           props.onEnd(key, false);
         }
       };
-      if (!(0, _ChildrenUtils.isSameChildren)(_this5.state.children, currentChildren, props.showProp)) {
+      if (!isSameChildren(_this5.state.children, currentChildren, props.showProp)) {
         _this5.setState({
           children: currentChildren
         }, end);
@@ -389,5 +350,4 @@ var _initialiseProps = function _initialiseProps() {
   };
 };
 
-exports['default'] = Animate;
-module.exports = exports['default'];
+export default Animate;

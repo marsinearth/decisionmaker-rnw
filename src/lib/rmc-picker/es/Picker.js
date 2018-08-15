@@ -102,14 +102,23 @@ var Picker = function (_React$Component) {
                 startY = y;
                 lastY = scrollY;
             };
-            var onMove = function onMove(y) {
+            var onMove = function onMove(y, isWheelScroll = false) {
                 if (scrollDisabled || !isMoving) {
                     return;
                 }
-                scrollY = lastY - y + startY;
+                if (isWheelScroll) {
+                  scrollY = lastY + y;
+                  lastY = scrollY;
+                } else {
+                  scrollY = lastY - y + startY;
+                }
+                
                 Velocity.record(scrollY);
                 _this.onScrollChange();
                 setTransform(_this.contentRef.style, 'translate3d(0,' + -scrollY + 'px,0)');
+                // console.log('scrollY: ', scrollY);
+                // console.log('startY: ', startY);
+                // console.log('lastY: ', lastY);
             };
             return {
                 touchstart: function touchstart(evt) {
@@ -125,6 +134,19 @@ var Picker = function (_React$Component) {
                 mousemove: function mousemove(evt) {
                     evt.preventDefault();
                     onMove(evt.screenY);
+                },
+                mousewheel: function mousewheel(evt) {
+                  const { pageY, deltaY } = evt;
+
+                  if (Math.abs(deltaY) > 1 && !isMoving) {
+                    onStart(evt.pageY);
+                  }
+                  if (Math.abs(deltaY) <= 1 && isMoving) {
+                    onFinish();
+                  }
+                  // console.log('%c isMoving: ', 'background-color:magenta; color: #444;', isMoving);
+                  // console.log('%c deltaY: ', 'background-color:cyan; color: #444;', deltaY);
+                  onMove(evt.deltaY, true);
                 },
                 touchend: function touchend() {
                     return onFinish();

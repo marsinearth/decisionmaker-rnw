@@ -6751,9 +6751,8 @@ raw-body@2.3.2:
     iconv-lite "0.4.19"
     unpipe "1.0.0"
 
-rc-animate@2.x:
+rc-animate@2.x, "rc-animate@file:./src/lib/rc-animate":
   version "2.4.4"
-  resolved "https://registry.yarnpkg.com/rc-animate/-/rc-animate-2.4.4.tgz#a05a784c747beef140d99ff52b6117711bef4b1e"
   dependencies:
     babel-runtime "6.x"
     css-animation "^1.3.2"
@@ -7338,9 +7337,8 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^3.0.0"
     inherits "^2.0.1"
 
-rmc-dialog@^1.0.1:
+rmc-dialog@^1.0.1, "rmc-dialog@file:./src/lib/rmc-dialog":
   version "1.1.1"
-  resolved "https://registry.yarnpkg.com/rmc-dialog/-/rmc-dialog-1.1.1.tgz#1d7fbc6b2cad5b0b53fbab71fe29636d76f78217"
   dependencies:
     babel-runtime "6.x"
     rc-animate "2.x"

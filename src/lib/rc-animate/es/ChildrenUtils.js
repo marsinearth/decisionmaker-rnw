@@ -1,30 +1,14 @@
-'use strict';
+import React from 'react';
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.toArrayChildren = toArrayChildren;
-exports.findChildInChildrenByKey = findChildInChildrenByKey;
-exports.findShownChildInChildrenByKey = findShownChildInChildrenByKey;
-exports.findHiddenChildInChildrenByKey = findHiddenChildInChildrenByKey;
-exports.isSameChildren = isSameChildren;
-exports.mergeChildren = mergeChildren;
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function toArrayChildren(children) {
+export function toArrayChildren(children) {
   var ret = [];
-  _react2['default'].Children.forEach(children, function (child) {
+  React.Children.forEach(children, function (child) {
     ret.push(child);
   });
   return ret;
 }
 
-function findChildInChildrenByKey(children, key) {
+export function findChildInChildrenByKey(children, key) {
   var ret = null;
   if (children) {
     children.forEach(function (child) {
@@ -39,7 +23,7 @@ function findChildInChildrenByKey(children, key) {
   return ret;
 }
 
-function findShownChildInChildrenByKey(children, key, showProp) {
+export function findShownChildInChildrenByKey(children, key, showProp) {
   var ret = null;
   if (children) {
     children.forEach(function (child) {
@@ -54,7 +38,7 @@ function findShownChildInChildrenByKey(children, key, showProp) {
   return ret;
 }
 
-function findHiddenChildInChildrenByKey(children, key, showProp) {
+export function findHiddenChildInChildrenByKey(children, key, showProp) {
   var found = 0;
   if (children) {
     children.forEach(function (child) {
@@ -67,7 +51,7 @@ function findHiddenChildInChildrenByKey(children, key, showProp) {
   return found;
 }
 
-function isSameChildren(c1, c2, showProp) {
+export function isSameChildren(c1, c2, showProp) {
   var same = c1.length === c2.length;
   if (same) {
     c1.forEach(function (child, index) {
@@ -86,7 +70,7 @@ function isSameChildren(c1, c2, showProp) {
   return same;
 }
 
-function mergeChildren(prev, next) {
+export function mergeChildren(prev, next) {
   var ret = [];
 
   // For each key of `next`, the list of keys to insert before that key in
