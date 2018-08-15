@@ -100,7 +100,7 @@ export default class Slotmachine extends PureComponent {
     let data, num, startIdx, endIdx, limit
     if (option === 'custom') {
       data = items.slice(0, -1).map(item => item.value)
-      num = data.length - 1
+      num = data.length
       startIdx = 0
       endIdx = num
       limit = num === 0 ? 1000 : Math.floor(1000 / num)
