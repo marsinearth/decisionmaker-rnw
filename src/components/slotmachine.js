@@ -13,7 +13,7 @@ const generateArray = async ({ data, startIdx, endIdx, limit, num }) => {
   for (let j = 0; j <= limit; j++) {
     for (
       let i = endIdx >= startIdx ? 0 : num;
-      endIdx >= startIdx ? i <= num : i > 0;
+      endIdx >= startIdx ? i < num : i > 0;
       endIdx >= startIdx ? i++ : i--
     ) {
       array.push({
@@ -114,9 +114,8 @@ export default class Slotmachine extends PureComponent {
         limit = Math.floor(1000 / Math.abs(endIdx - startIdx))
       }    
       data = [...Array(endIdx + 1).keys()].filter(key => (
-        ![...Array(startIdx + 1).keys()].includes(key)
+        ![...Array(startIdx).keys()].includes(key)
       ))
-      console.log('data: ', data);
     }
     return { data, startIdx, endIdx, limit, num }
   }
