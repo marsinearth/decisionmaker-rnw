@@ -142,7 +142,7 @@ export default class App extends PureComponent {
             accessibilityRole="heading"
             aria-level="2"
           >
-            Decision Maker{"\n"} on React Native for Web
+            Decision Maker on{"\n"}React Native for Web
           </Text>
         </View>
         <View style={styles.mainContainer}>
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
   app: {
     flex: 1,
     justifyContent: 'center',
-    marginHorizontal: "auto"
+    paddingBottom: 35
   },
   logo: {
     height: 130

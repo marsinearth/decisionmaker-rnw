@@ -9,7 +9,6 @@
     "react-app-rewired": "^1.5.2",
     "react-art": "^16.4.1",
     "react-dom": "^16.4.1",
-    "react-infinite-scroller": "^1.2.0",
     "react-native": "0.55.4",
     "react-native-elements": "Gregor1971/react-native-elements#master",
     "react-native-vector-icons": "^4.6.0",

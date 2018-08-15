@@ -116,9 +116,6 @@ var Picker = function (_React$Component) {
                 Velocity.record(scrollY);
                 _this.onScrollChange();
                 setTransform(_this.contentRef.style, 'translate3d(0,' + -scrollY + 'px,0)');
-                // console.log('scrollY: ', scrollY);
-                // console.log('startY: ', startY);
-                // console.log('lastY: ', lastY);
             };
             return {
                 touchstart: function touchstart(evt) {
@@ -144,8 +141,6 @@ var Picker = function (_React$Component) {
                   if (Math.abs(deltaY) <= 1 && isMoving) {
                     onFinish();
                   }
-                  // console.log('%c isMoving: ', 'background-color:magenta; color: #444;', isMoving);
-                  // console.log('%c deltaY: ', 'background-color:cyan; color: #444;', deltaY);
                   onMove(evt.deltaY, true);
                 },
                 touchend: function touchend() {

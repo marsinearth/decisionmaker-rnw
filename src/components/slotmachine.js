@@ -4,39 +4,39 @@ import Picker from 'rmc-picker/es/Picker'
 import Popup from 'rmc-picker/es/Popup'
 import 'rmc-picker/assets/index.css'
 import 'rmc-picker/assets/popup.css'
-// import InfiniteScroll from 'react-infinite-scroller'
-import produce from 'immer'
 
 const generateArray = async ({ data, startIdx, endIdx, limit, num }) => {
   let init = 0
-  const array = []
+  const generatedArray = []
   for (let j = 0; j <= limit; j++) {
     for (
       let i = endIdx >= startIdx ? 0 : num;
       endIdx >= startIdx ? i < num : i > 0;
       endIdx >= startIdx ? i++ : i--
     ) {
-      array.push({
+      generatedArray.push({
         label: init,
         datum: data[i]
       });
       init++
     }
   }
-  return array
+  return { generatedArray, num }
 }
 
-const PickerComp = ({ items, value, onChangeValue }) => (
+const PickerComp = ({ items, value, onChangeValue, onLoadMore }) => (
   <Picker
     selectedValue={value}
     onValueChange={onChangeValue}
+    onScrollChange={e => {
+      console.log('scroll thignL: ', e)
+    }}
   >
     {items.map(({ label, datum }) => (
       <Picker.Item key={label} value={label}>
         {datum}
       </Picker.Item>
-    ))
-    }
+    ))}
   </Picker>
 )
 
@@ -54,12 +54,16 @@ export default class Slotmachine extends PureComponent {
     }
   }
 
-  onReady = async () => {
+  onItemsCalculate = async () => {
     const processedData = this.dataPrepare()
-    const generatedItems = await generateArray(processedData)
-    const itemsLength = generatedItems.length
-    const value = await this.calibrateValue(itemsLength, processedData.num)
-    this.setState({ value, items: generatedItems })
+    return await generateArray(processedData)
+  }
+
+  onReady = async () => {
+    const { generatedArray, num } = await this.onItemsCalculate()
+    const itemsLength = generatedArray.length
+    const value = await this.calibrateValue(itemsLength, num)
+    this.setState({ value, items: generatedArray })
   }
   onOk = () => {
     const { items, value } = this.state
@@ -71,17 +75,15 @@ export default class Slotmachine extends PureComponent {
     this.setState({ value })
   }
 
-  onLoadMore = () => {
-    const { num, ...processedData } = this.dataPrepare()
-    const generatedItems = generateArray({...processedData})
-    this.setState(
-      produce(draft => {
-        draft.items.concat(generatedItems)
-        const itemsLength = draft.items.length
-        const value = this.calibrateValue(itemsLength, num)
-        draft.value = value
-      })
-    )
+  onLoadMore = async () => {
+    const { generatedArray } = await this.onItemsCalculate()
+    this.setState(prevState => ({
+      items: [
+        ...prevState.items,
+        ...generatedArray
+      ],
+
+    }))
   }
 
   calibrateValue = async (dataLength, num) => {
@@ -136,6 +138,7 @@ export default class Slotmachine extends PureComponent {
                 items={items}
                 value={value}
                 onChangeValue={this.onChangeValue}
+                onLoadMore={this.onLoadMore}
               />
             }
             title="Roll & Pick!!!"
