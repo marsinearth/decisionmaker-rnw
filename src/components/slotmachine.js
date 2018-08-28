@@ -4,9 +4,12 @@ import Picker from 'rmc-picker/es/Picker'
 import Popup from 'rmc-picker/es/Popup'
 import 'rmc-picker/assets/index.css'
 import 'rmc-picker/assets/popup.css'
+// import throttle from 'lodash.throttle'
+
+// TODO: gotta deal with the structure of this.state.items. you can't deal with the negative labels in current structure
 
 const generateArray = async ({ data, startIdx, endIdx, limit, num }) => {
-  let init = 0
+  let init = endIdx >= startIdx ? 0 : num
   const generatedArray = []
   for (let j = 0; j <= limit; j++) {
     for (
@@ -28,12 +31,25 @@ const PickerComp = ({ items, value, onChangeValue, onLoadMore }) => (
   <Picker
     selectedValue={value}
     onValueChange={onChangeValue}
-    onScrollChange={e => {
-      console.log('scroll thignL: ', e)
-    }}
+    /* onScrollChange={
+        throttle(
+          (scrollHeight) => {
+            // console.log('%c scrollHeight: ', 'background-color:purple; color:#FFF;', scrollHeight)
+            if (scrollHeight <= items[0].label + 200) {
+              console.log('%c items[0].label: ', 'background-color:purple; color:#FFF;', items[0].label)
+              onLoadMore('prev')
+            } else if (scrollHeight >= items.length - 200) {
+              console.log('%c items.length - 200: ', 'background-color:purple; color:#FFF;', items.length - 200)
+              onLoadMore('next')
+            }
+          },
+          2000000,
+          { trailing: false }
+        )        
+    }*/
   >
-    {items.map(({ label, datum }) => (
-      <Picker.Item key={label} value={label}>
+    {items.map(({ label, datum }, index) => (
+      <Picker.Item key={index} value={label}>
         {datum}
       </Picker.Item>
     ))}
@@ -50,22 +66,38 @@ export default class Slotmachine extends PureComponent {
     const { items: { length: itemsLength }} = this.state
     const { items: { length: prevItemsLength }} = prevState
     if (itemsLength !== prevItemsLength) {
-
+      console.log('%c prevItemsLength: ', 'background-color:purple; color:#FFF;', prevItemsLength)
+      console.log('%c itemsLength: ', 'background-color:magenta; color:#FFF;', itemsLength)
     }
   }
 
-  onItemsCalculate = async () => {
-    const processedData = this.dataPrepare()
-    return await generateArray(processedData)
+  onReset = () => {
+    this.setState({ items: [] })
   }
 
-  onReady = async () => {
+  onDismiss = () => {
+    this.onReset()
+  }
+
+  onItemsCalculate = async (order) => {
+    const { num, ...processedData } = this.dataPrepare()
+    const { length: itemsLen } = this.state.items
+    let newNum = itemsLen + num
+    if (order === 'prev') {
+      newNum = -(Math.abs(itemsLen) + num)
+    }
+    return await generateArray({ num: newNum, ...processedData })
+  }
+
+  onReady = async () => {    
     const { generatedArray, num } = await this.onItemsCalculate()
     const itemsLength = generatedArray.length
     const value = await this.calibrateValue(itemsLength, num)
     this.setState({ value, items: generatedArray })
   }
+
   onOk = () => {
+    this.onReset()
     const { items, value } = this.state
     const selectedValue = items[value].datum
     this.props.answer(selectedValue)
@@ -75,15 +107,28 @@ export default class Slotmachine extends PureComponent {
     this.setState({ value })
   }
 
-  onLoadMore = async () => {
-    const { generatedArray } = await this.onItemsCalculate()
-    this.setState(prevState => ({
-      items: [
-        ...prevState.items,
-        ...generatedArray
-      ],
-
-    }))
+  onLoadMore = async (order) => {
+    const { generatedArray } = await this.onItemsCalculate(order)
+    console.log('generatedArray: ', generatedArray)
+    this.setState(prevState => {
+      if (order === 'prev') {
+        return { 
+          items: [
+            ...generatedArray,
+            ...prevState.items
+          ]   
+        }     
+      } else {
+        return {
+          items: [
+            ...prevState.items,
+            ...generatedArray
+          ]
+        }
+      }  
+    }, () => {
+      console.log('after setState of items on onLoadMore: ', this.state.items)
+    })
   }
 
   calibrateValue = async (dataLength, num) => {
@@ -144,6 +189,7 @@ export default class Slotmachine extends PureComponent {
             title="Roll & Pick!!!"
             value={value}
             onOk={this.onOk}
+            onDismiss={this.onDismiss}
             disabled={disabled}
           >
             <TouchableHighlight

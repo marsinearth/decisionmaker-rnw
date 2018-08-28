@@ -1,7 +1,7 @@
 .rmc-picker,
 .rmc-multi-picker {
-  height: 238px;
-  /*34*7*/
+  height: 340px;
+  /*34*10*/
 }
 .rmc-multi-picker {
   display: -ms-flexbox;
