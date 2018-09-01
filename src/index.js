@@ -1,9 +1,28 @@
-import React from "react"
+import React, { Fragment } from "react"
 import ReactDOM from "react-dom"
+import GitHubForkRibbon from "react-github-fork-ribbon";
 import App from "./components/App"
 import registerServiceWorker from "./registerServiceWorker"
 
-ReactDOM.render(<App />, document.getElementById("root"));
+const ForkRibbon = () => (
+  <GitHubForkRibbon
+    position="right"
+    color="black"
+    href="//github.com/marsinearth/decisionmaker-rnw"
+    target="_blank" 
+  >
+		<b style={{'fontFamily':'Eczar'}}>Go To Source Code</b>
+	</GitHubForkRibbon>
+)
+
+const Wrapper = () => (
+  <Fragment>
+    <ForkRibbon />
+    <App />
+  </Fragment>
+)
+
+ReactDOM.render(<Wrapper />, document.getElementById("root"));
 registerServiceWorker();
 
 const injectFonts = () => {
