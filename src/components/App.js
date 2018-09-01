@@ -1,4 +1,4 @@
-import React, { PureComponent, Fragment } from 'react'
+import React, { PureComponent, Fragment, createRef } from 'react'
 import { 
   Image, 
   StyleSheet, 
@@ -27,6 +27,8 @@ export default class App extends PureComponent {
     answer: '',
     disabled: true
   }
+
+  questionRef = createRef()
 
   componentDidUpdate(prevProps, prevState) {
     const { items, items: { length: itemsLen }, numRange, numRange: [from, to] } = this.state
@@ -152,12 +154,14 @@ export default class App extends PureComponent {
           <View style={styles.questionContainer}>
             <TextInput
               name="question"
+              ref={this.questionRef}
               placeholder="type your question here"
               placeholderTextColor="orange"
               onChange={this.handleInputChange}
               multiline
               value={question}
               style={styles.questionText}
+              // onLayout={this.onLoadQuestion}
             />
           </View>    
           {answer !== '' && (
@@ -264,14 +268,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 0,
-    height: 'auto'
   },
   questionText: {
-    width: '100%',
+    width: '80%',
     wordWrap: 'break-word',
     justifyContent: 'center',
     alignSelf: 'center',
     paddingTop: '2rem',
+    minHeight: '2rem',
     lineHeight: '2rem',
     fontFamily: 'bungee, cursive',
     fontSize: '1.25rem',
@@ -324,7 +328,7 @@ const styles = StyleSheet.create({
   code: {
     fontFamily: "monospace, monospace"
   }
-});
+})
 
 export const inputStyles = StyleSheet.create({
   inputContainer: {

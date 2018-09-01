@@ -102,7 +102,7 @@ var Picker = function (_React$Component) {
                 startY = y;
                 lastY = scrollY;
             };
-            var onMove = function onMove(y, isWheelScroll = false) {
+            var onMove = function onMove(y, isWheelScroll) {
                 if (scrollDisabled || !isMoving) {
                     return;
                 }
@@ -133,12 +133,10 @@ var Picker = function (_React$Component) {
                     onMove(evt.screenY);
                 },
                 mousewheel: function mousewheel(evt) {
-                  const { pageY, deltaY } = evt;
-
-                  if (Math.abs(deltaY) > 1 && !isMoving) {
+                  if (Math.abs(evt.deltaY) > 1 && !isMoving) {
                     onStart(evt.pageY);
                   }
-                  if (Math.abs(deltaY) <= 1 && isMoving) {
+                  if (Math.abs(evt.deltaY) <= 1 && isMoving) {
                     onFinish();
                   }
                   onMove(evt.deltaY, true);
