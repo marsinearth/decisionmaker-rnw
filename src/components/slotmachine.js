@@ -168,7 +168,7 @@ export default class Slotmachine extends PureComponent {
   }
 
   render() {
-    const { disabled } = this.props
+    const { disabled, onReset } = this.props
     const { items, value } = this.state
     return (
       <ScrollView>
@@ -192,18 +192,32 @@ export default class Slotmachine extends PureComponent {
             onDismiss={this.onDismiss}
             disabled={disabled}
           >
-            <TouchableHighlight
-              activeOpacity={0.5} 
-              underlayColor="#a9d9d4"
-              disabled={disabled} 
-              onPress={this.onReady}
-            >
-              <View style={styles.readyBtnContainer}>
-                <Text style={[styles.readyBtnText, { color: disabled ? '#888' : 'black' }]}>
-                  {'Ready'}
-                </Text>
-              </View>
-            </TouchableHighlight>
+            <View style={styles.readyBtnsContainer}>
+              <TouchableHighlight
+                activeOpacity={0.5} 
+                underlayColor="#a9d9d4"
+                disabled={disabled} 
+                onPress={this.onReady}
+              >
+                <View style={styles.readyBtnContainer}>
+                  <Text style={[styles.readyBtnText, { color: disabled ? '#888' : 'black' }]}>
+                    {'Ready'}
+                  </Text>
+                </View>
+              </TouchableHighlight>
+              <TouchableHighlight
+                activeOpacity={0.5} 
+                underlayColor="#a9d9d4"
+                disabled={disabled} 
+                onPress={onReset}
+              >
+                <View style={styles.readyBtnContainer}>
+                  <Text style={[styles.readyBtnText, { color: disabled ? '#888' : 'black' }]}>
+                    {'Reset'}
+                  </Text>
+                </View>
+              </TouchableHighlight>
+            </View>
           </Popup>
         </View>
       </ScrollView>
@@ -217,12 +231,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
+  readyBtnsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
   readyBtnContainer: {
     width: 60,
     borderRadius: 3,
     borderWidth: 1,
     borderColor: '#999',
     paddingVertical: '0.25rem',
+    marginHorizontal: '0.25rem',
     cursor: 'pointer',
     outline: 'none'
   },

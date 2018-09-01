@@ -129,7 +129,12 @@ export default class App extends PureComponent {
   }
 
   resetItems = () => {
-    this.setState({ items: initialItems })
+    const { selectedOption } = this.state
+    if (selectedOption === 'numbers') {
+      this.setState({ numRange: ['', ''] })
+    } else {
+      this.setState({ items: initialItems })
+    }    
   }
 
   render() {
@@ -242,6 +247,7 @@ export default class App extends PureComponent {
             items={items}
             numRange={numRange}
             onSubmitClick={this.handleSubmit}
+            onReset={this.resetItems}
             disabled={disabled}
             answer={this.answerOn}
           />
