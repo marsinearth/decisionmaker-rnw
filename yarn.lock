@@ -6751,8 +6751,9 @@ raw-body@2.3.2:
     iconv-lite "0.4.19"
     unpipe "1.0.0"
 
-rc-animate@2.x, "rc-animate@file:./src/lib/rc-animate":
+rc-animate@2.x:
   version "2.4.4"
+  resolved "https://registry.yarnpkg.com/rc-animate/-/rc-animate-2.4.4.tgz#a05a784c747beef140d99ff52b6117711bef4b1e"
   dependencies:
     babel-runtime "6.x"
     css-animation "^1.3.2"
@@ -6846,15 +6847,14 @@ react-github-fork-ribbon@^0.6.0:
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/react-github-fork-ribbon/-/react-github-fork-ribbon-0.6.0.tgz#8b7454fec5bd5481af7fdf6d0fc8aa7653373301"
 
-react-native-elements@Gregor1971/react-native-elements#master:
-  version "1.0.0-rnw"
-  resolved "https://codeload.github.com/Gregor1971/react-native-elements/tar.gz/d7a51e7796a4c59b51d3fc1c4669e536ad88061a"
+react-native-elements@^0.19.1:
+  version "0.19.1"
+  resolved "https://registry.yarnpkg.com/react-native-elements/-/react-native-elements-0.19.1.tgz#f92b69d864a150215d01f81fe3c52a9cada83e45"
   dependencies:
     lodash.isempty "^4.4.0"
     lodash.times "^4.3.2"
     opencollective "^1.0.3"
     prop-types "^15.5.8"
-    react-art "^16.4.1"
 
 react-native-vector-icons@^4.6.0:
   version "4.6.0"

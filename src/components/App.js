@@ -14,16 +14,18 @@ import Slotmachine from './slotmachine'
 import { findReactElement } from '../utils'
 import cogito from '../assets/cogito_loading.gif'
 
+const initialItems = [{
+  placeholder: 'item 1',
+  value: ''
+}]
+
 export default class App extends PureComponent {
   state = {
     selectedOption: 'custom',
     question: '',
     maxInputIndex: 1,
     numRange: ['', ''],
-    items: [{
-      placeholder: 'item 1',
-      value: ''
-    }],
+    items: initialItems,
     answer: '',
     disabled: true
   }
@@ -95,7 +97,12 @@ export default class App extends PureComponent {
   handleSelectType = e => {
     const { currentTarget } = e
     const extractedCurrentTarget = findReactElement(currentTarget) 
-    const { props: { name } = {}} = extractedCurrentTarget
+    let name = 'custom'
+    if (process.env.NODE_ENV === 'production') {
+      ({ memoizedProps: { name }} = extractedCurrentTarget)
+    } else {
+      ({ props: { name }} = extractedCurrentTarget)
+    }
     this.setState({ selectedOption: name })
   }
 
@@ -119,6 +126,10 @@ export default class App extends PureComponent {
 
   answerOn = answer => {
     this.setState({ answer })
+  }
+
+  resetItems = () => {
+    this.setState({ items: initialItems })
   }
 
   render() {

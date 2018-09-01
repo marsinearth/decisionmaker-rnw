@@ -1,6 +1,6 @@
 # Decision Maker on React Native Web
-_A semi-automatic random picking decision maker_
-<br /><h4>**[Demo](https://marsinearth.github.io/decisionmaker-rnw/)**</h4>
+_A semi-automatic random picking decision maker built with react-native-web_
+<br /><h3>**[Demo](https://decisionmaker-rnw.netlify.com/)**</h3>
 ## How-To
 1. Type in your question needs to be decided.
 2. Select the type and contents of the options you'd like
