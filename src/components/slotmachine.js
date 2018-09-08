@@ -56,6 +56,21 @@ const PickerComp = ({ items, value, onChangeValue, onLoadMore }) => (
   </Picker>
 )
 
+const BottomButton = ({ title, onPress, disabled, confirmColor }) => (
+  <TouchableHighlight
+    activeOpacity={0.5} 
+    underlayColor="#a9d9d4"
+    disabled={disabled} 
+    onPress={onPress}
+  >
+    <View style={styles.readyBtnContainer}>
+      <Text style={[styles.readyBtnText, { color: disabled ? '#888' : confirmColor }]}>
+        {title}
+      </Text>
+    </View>
+  </TouchableHighlight>
+)
+
 export default class Slotmachine extends PureComponent {
   state = {
     items: [],
@@ -80,7 +95,7 @@ export default class Slotmachine extends PureComponent {
   }
 
   onItemsCalculate = async (order) => {
-    const { num, ...processedData } = this.dataPrepare()
+    const { num, ...processedData } = await this.dataPrepare()
     const { length: itemsLen } = this.state.items
     let newNum = itemsLen + num
     if (order === 'prev') {
@@ -138,15 +153,15 @@ export default class Slotmachine extends PureComponent {
     } else {
       calcNum = num
     }
-    const comp = Math.floor(Math.floor(dataLength / calcNum) * calcNum / 2)
+    const comp = await Math.floor(Math.floor(dataLength / calcNum) * calcNum / 2)
     return comp - comp % calcNum
   }
 
-  dataPrepare = () => {
+  dataPrepare = async () => {
     const { option, items, numRange: [from, to] } = this.props
     let data, num, startIdx, endIdx, limit
     if (option === 'custom') {
-      data = items.slice(0, -1).map(item => item.value)
+      data = await items.slice(0, -1).map(item => item.value)
       num = data.length
       startIdx = 0
       endIdx = num
@@ -160,7 +175,7 @@ export default class Slotmachine extends PureComponent {
       } else {
         limit = Math.floor(1000 / Math.abs(endIdx - startIdx))
       }    
-      data = [...Array(endIdx + 1).keys()].filter(key => (
+      data = await [...Array(endIdx + 1).keys()].filter(key => (
         ![...Array(startIdx).keys()].includes(key)
       ))
     }
@@ -170,6 +185,18 @@ export default class Slotmachine extends PureComponent {
   render() {
     const { disabled, onReset } = this.props
     const { items, value } = this.state
+    const bottomBtnList = [{
+      title: 'Ready',
+      onPress: this.onReady,
+      confirmColor: '#444',
+      disabled
+    },
+    {
+      title: 'Reset',
+      onPress: onReset,
+      confirmColor: '#AD5A51',
+      disabled
+    }]
     return (
       <ScrollView>
         <View style={styles.container}>
@@ -193,30 +220,12 @@ export default class Slotmachine extends PureComponent {
             disabled={disabled}
           >
             <View style={styles.readyBtnsContainer}>
-              <TouchableHighlight
-                activeOpacity={0.5} 
-                underlayColor="#a9d9d4"
-                disabled={disabled} 
-                onPress={this.onReady}
-              >
-                <View style={styles.readyBtnContainer}>
-                  <Text style={[styles.readyBtnText, { color: disabled ? '#888' : 'black' }]}>
-                    {'Ready'}
-                  </Text>
-                </View>
-              </TouchableHighlight>
-              <TouchableHighlight
-                activeOpacity={0.5} 
-                underlayColor="#a9d9d4"
-                disabled={disabled} 
-                onPress={onReset}
-              >
-                <View style={styles.readyBtnContainer}>
-                  <Text style={[styles.readyBtnText, { color: disabled ? '#888' : 'black' }]}>
-                    {'Reset'}
-                  </Text>
-                </View>
-              </TouchableHighlight>
+              {bottomBtnList.map(btnData => (
+                <BottomButton
+                  key={btnData.title} 
+                  {...btnData}
+                 />
+              ))}              
             </View>
           </Popup>
         </View>
