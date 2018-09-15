@@ -104,7 +104,8 @@ export default class Slotmachine extends PureComponent {
     return await generateArray({ num: newNum, ...processedData })
   }
 
-  onReady = async () => {    
+  onReady = async (e) => {    
+    console.log('onReady pushed!', e)
     const { generatedArray, num } = await this.onItemsCalculate()
     const itemsLength = generatedArray.length
     const value = await this.calibrateValue(itemsLength, num)
