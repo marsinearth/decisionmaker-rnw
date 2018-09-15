@@ -59,7 +59,7 @@ const PickerComp = ({ items, value, onChangeValue, onLoadMore }) => (
 const BottomButton = ({ title, onPress, disabled, confirmColor }) => (
   <TouchableHighlight
     activeOpacity={0.5} 
-    underlayColor="#a9d9d4"
+    underlayColor="#d7dbdd"
     disabled={disabled} 
     onPress={onPress}
   >
@@ -86,12 +86,8 @@ export default class Slotmachine extends PureComponent {
     }
   }
 
-  onReset = () => {
-    this.setState({ items: [] })
-  }
-
-  onDismiss = () => {
-    this.onReset()
+  onReset = (cbFunc = () => { null }) => {
+    this.setState({ items: [] }, () => { cbFunc() })
   }
 
   onItemsCalculate = async (order) => {
@@ -106,17 +102,18 @@ export default class Slotmachine extends PureComponent {
 
   onReady = async (e) => {    
     console.log('onReady pushed!', e)
-    const { generatedArray, num } = await this.onItemsCalculate()
-    const itemsLength = generatedArray.length
-    const value = await this.calibrateValue(itemsLength, num)
-    this.setState({ value, items: generatedArray })
+    this.onReset(async () => {
+      const { generatedArray, num } = await this.onItemsCalculate()
+      const itemsLength = generatedArray.length
+      const value = await this.calibrateValue(itemsLength, num)
+      this.setState({ value, items: generatedArray })
+    })
   }
 
   onOk = () => {
-    this.onReset()
     const { items, value } = this.state
     const selectedValue = items[value].datum
-    this.props.answer(selectedValue)
+    this.props.answer(selectedValue)  
   }
 
   onChangeValue = value => {
@@ -242,6 +239,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   readyBtnsContainer: {
+    width: 130,
     flexDirection: 'row',
     justifyContent: 'space-between'
   },
@@ -250,8 +248,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     borderWidth: 1,
     borderColor: '#999',
-    paddingVertical: '0.25rem',
-    marginHorizontal: '0.25rem',
+    padding: '0.25rem',
     cursor: 'pointer',
     outline: 'none'
   },
