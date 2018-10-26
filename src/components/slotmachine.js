@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { View, ScrollView, StyleSheet } from 'react-native'
+import { View, ScrollView, StyleSheet, Keyboard } from 'react-native'
 import Picker from 'rmc-picker/es/Picker'
 import Popup from 'rmc-picker/es/Popup'
 import 'rmc-picker/assets/index.css'
@@ -87,6 +87,7 @@ export default class SlotMachine extends PureComponent {
   }
 
   onReady = () => {
+    Keyboard.dismiss()
     this.onReset(() => {
       this.onItemsCalculate().then(({ generatedArray, num }) => {
         const itemsLength = generatedArray.length
@@ -203,10 +204,7 @@ export default class SlotMachine extends PureComponent {
             </TouchableHighlight>*/}
             <BottomButton
               title="Ready"
-              onPress={e => {
-                console.log('%c onPress e: ', 'background-color:yellow; color:#444;', e);
-                this.onReady(e);
-              }}
+              onPress={this.onReady}
               confirmColor="#444"
               disabled={disabled}
             />
