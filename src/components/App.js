@@ -4,13 +4,14 @@ import {
   StyleSheet, 
   Text, 
   TextInput,
-  View
+  View,
+  TouchableHighlight
 } from 'react-native'
 import { CheckBox } from 'react-native-elements'
 import produce from 'immer'
 import ErrorBoundary from './errorBoundary'
 import CustomInputList from './customInput'
-import Slotmachine from './slotmachine'
+import SlotMachine from './slotmachine'
 import { findReactElement } from '../utils'
 import cogito from '../assets/cogito_loading.gif'
 
@@ -18,6 +19,24 @@ const initialItems = [{
   placeholder: 'item 1',
   value: ''
 }]
+
+export const BottomButton = ({ title, onPress, disabled, confirmColor, leftMargin, onPressOut }) => (
+  <View style={leftMargin}>
+    <TouchableHighlight
+      activeOpacity={0.5} 
+      underlayColor="#d7dbdd"
+      disabled={disabled} 
+      onPress={onPress}
+      onPressOut={onPressOut}
+    >
+      <View style={styles.readyBtnContainer}>
+        <Text style={[styles.readyBtnText, { color: disabled ? '#888' : confirmColor }]}>
+          {title}
+        </Text>
+      </View>
+    </TouchableHighlight>
+  </View>
+)
 
 export default class App extends PureComponent {
   state = {
@@ -160,7 +179,9 @@ export default class App extends PureComponent {
             accessibilityRole="heading"
             aria-level="2"
           >
-            Decision Maker on{"\n"}React Native for Web
+            Decision Maker on
+            {"\n"}
+            React Native for Web
           </Text>
         </View>
         <View style={styles.mainContainer}>
@@ -191,20 +212,20 @@ export default class App extends PureComponent {
             Select Type
           </Text>          
           <View style={styles.selectTypeContainer}>
-          {['custom', 'numbers'].map(type => (
-            <CheckBox
-              key={type}
-              title={type}
-              name={type}
-              containerStyle={styles.selectTypeButtonStyle}
-              textStyle={styles.selectTypeTextStyle}
-              checkedIcon="dot-circle-o"
-              uncheckedIcon="circle-o"
-              checkedColor="#888"
-              checked={selectedOption === type}
-              onPress={this.handleSelectType}
-            />
-          ))}
+            {['custom', 'numbers'].map(type => (
+              <CheckBox
+                key={type}
+                title={type}
+                name={type}
+                containerStyle={styles.selectTypeButtonStyle}
+                textStyle={styles.selectTypeTextStyle}
+                checkedIcon="dot-circle-o"
+                uncheckedIcon="circle-o"
+                checkedColor="#888"
+                checked={selectedOption === type}
+                onPress={this.handleSelectType}
+              />
+            ))}
           </View>
           <ErrorBoundary>
             <View style={styles.inputListContainer}>
@@ -242,15 +263,23 @@ export default class App extends PureComponent {
               )}
             </View>
           </ErrorBoundary>
-          <Slotmachine
-            option={selectedOption}
-            items={items}
-            numRange={numRange}
-            onSubmitClick={this.handleSubmit}
-            onReset={this.resetItems}
-            disabled={disabled}
-            answer={this.answerOn}
-          />
+          <View style={styles.readyBtnsContainer}>
+            <SlotMachine
+              option={selectedOption}
+              items={items}
+              numRange={numRange}
+              onSubmitClick={this.handleSubmit}
+              disabled={disabled}
+              answer={this.answerOn}
+            />
+            <BottomButton
+              title="Reset"
+              onPress={this.resetItems}
+              confirmColor="#AD5A51"
+              disabled={disabled}
+              leftMargin={styles.leftMargin}
+            />
+          </View>
         </View>
       </View>
     );
@@ -339,11 +368,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: '0.5rem',
   },
-  link: {
-    color: "#1B95E0"
+  readyBtnsContainer: {
+    flexDirection: 'row',
+    alignSelf: 'center'
   },
-  code: {
-    fontFamily: "monospace, monospace"
+  readyBtnContainer: {
+    width: 60,
+    borderRadius: 3,
+    borderWidth: 1,
+    borderColor: '#999',
+    padding: '0.2rem',
+    cursor: 'pointer',
+    outline: 'none',
+    boxSizing: 'border-box'
+  },
+  leftMargin: {
+    marginLeft: 10
+  },
+  readyBtnText: {
+    fontFamily: 'bungee, cursive',
+    lineHeight: "1rem",
+    fontSize: "0.7rem",
+    textAlign: "center"  
   }
 })
 

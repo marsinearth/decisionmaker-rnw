@@ -1,9 +1,10 @@
 import React, { PureComponent } from 'react'
-import { View, Text, TouchableHighlight, ScrollView, StyleSheet } from 'react-native'
+import { View, ScrollView, StyleSheet } from 'react-native'
 import Picker from 'rmc-picker/es/Picker'
 import Popup from 'rmc-picker/es/Popup'
 import 'rmc-picker/assets/index.css'
 import 'rmc-picker/assets/popup.css'
+import { BottomButton } from './App'
 // import throttle from 'lodash.throttle'
 
 // TODO: gotta deal with the structure of this.state.items. you can't deal with the negative labels in current structure
@@ -56,26 +57,11 @@ const PickerComp = ({ items, value, onChangeValue, onLoadMore }) => (
   </Picker>
 )
 
-const BottomButton = ({ title, onPress, disabled, confirmColor }) => (
-  <TouchableHighlight
-    activeOpacity={0.5} 
-    underlayColor="#d7dbdd"
-    disabled={disabled} 
-    onPress={onPress}
-  >
-    <View style={styles.readyBtnContainer}>
-      <Text style={[styles.readyBtnText, { color: disabled ? '#888' : confirmColor }]}>
-        {title}
-      </Text>
-    </View>
-  </TouchableHighlight>
-)
-
-export default class Slotmachine extends PureComponent {
+export default class SlotMachine extends PureComponent {
   state = {
     items: [],
-    value: 0,
-  };
+    value: 0
+  }    
 
   componentDidUpdate(prevProps, prevState) {
     const { items: { length: itemsLength }} = this.state
@@ -86,8 +72,8 @@ export default class Slotmachine extends PureComponent {
     }
   }
 
-  onReset = (cbFunc = () => { null }) => {
-    this.setState({ items: [] }, () => { cbFunc() })
+  onReset = cbFunc => {
+    this.setState({ items: [] }, cbFunc)
   }
 
   onItemsCalculate = async (order) => {
@@ -100,20 +86,20 @@ export default class Slotmachine extends PureComponent {
     return await generateArray({ num: newNum, ...processedData })
   }
 
-  onReady = async (e) => {    
-    console.log('onReady pushed!', e)
-    this.onReset(async () => {
-      const { generatedArray, num } = await this.onItemsCalculate()
-      const itemsLength = generatedArray.length
-      const value = await this.calibrateValue(itemsLength, num)
-      this.setState({ value, items: generatedArray })
+  onReady = () => {
+    this.onReset(() => {
+      this.onItemsCalculate().then(({ generatedArray, num }) => {
+        const itemsLength = generatedArray.length
+        const value = this.calibrateValue(itemsLength, num)
+        this.setState({ value, items: generatedArray })
+      })      
     })
   }
 
   onOk = () => {
     const { items, value } = this.state
-    const selectedValue = items[value].datum
-    this.props.answer(selectedValue)  
+    const { [value]: { datum } = {}} = items
+    this.props.answer(datum)  
   }
 
   onChangeValue = value => {
@@ -144,14 +130,14 @@ export default class Slotmachine extends PureComponent {
     })
   }
 
-  calibrateValue = async (dataLength, num) => {
+  calibrateValue = (dataLength, num) => {
     let calcNum;
     if (num === 0) {
       calcNum = 1
     } else {
       calcNum = num
     }
-    const comp = await Math.floor(Math.floor(dataLength / calcNum) * calcNum / 2)
+    const comp = Math.floor(Math.floor(dataLength / calcNum) * calcNum / 2)
     return comp - comp % calcNum
   }
 
@@ -181,53 +167,52 @@ export default class Slotmachine extends PureComponent {
   }
 
   render() {
-    const { disabled, onReset } = this.props
-    const { items, value } = this.state
-    const bottomBtnList = [{
-      title: 'Ready',
-      onPress: this.onReady,
-      confirmColor: '#444',
-      disabled
-    },
-    {
-      title: 'Reset',
-      onPress: onReset,
-      confirmColor: '#AD5A51',
-      disabled
-    }]
-    return (
+    const { disabled } = this.props
+    const { items, value } = this.state    
+    return (      
       <ScrollView>
-        <View style={styles.container}>
+        <View style={styles.container}>         
           <Popup
-            className="fortest"
             transitionName="rmc-picker-popup-slide-fade"
             maskTransitionName="rmc-picker-popup-fade"
             maskClosable={false}
-            content={
-              <PickerComp
-                items={items}
-                value={value}
-                onChangeValue={this.onChangeValue}
-                onLoadMore={this.onLoadMore}
-              />
-            }
+            content={PickerComp({
+              items,
+              value,
+              onChangeValue: this.onChangeValue,
+              onLoadMore: this.onLoadMore
+            })}
             title="Roll & Pick!!!"
             value={value}
             onOk={this.onOk}
             onDismiss={this.onDismiss}
             disabled={disabled}
-          >
-            <View style={styles.readyBtnsContainer}>
-              {bottomBtnList.map(btnData => (
-                <BottomButton
-                  key={btnData.title} 
-                  {...btnData}
-                 />
-              ))}              
-            </View>
-          </Popup>
-        </View>
-      </ScrollView>
+            triggerType="onPressOut"
+          >       
+            {/* <TouchableHighlight
+              activeOpacity={0.5} 
+              underlayColor="#d7dbdd"
+              disabled={disabled} 
+              onPress={this.onReady}
+            >
+              <View style={styles.readyBtnContainer}>
+                <Text style={[styles.readyBtnText, { color: disabled ? '#888' : '#444' }]}>
+                  Ready
+                </Text>
+              </View>
+            </TouchableHighlight>*/}
+            <BottomButton
+              title="Ready"
+              onPress={e => {
+                console.log('%c onPress e: ', 'background-color:yellow; color:#444;', e);
+                this.onReady(e);
+              }}
+              confirmColor="#444"
+              disabled={disabled}
+            />
+          </Popup>            
+        </View>          
+      </ScrollView>        
     )
   }
 }
@@ -236,26 +221,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center'
-  },
-  readyBtnsContainer: {
-    width: 130,
-    flexDirection: 'row',
-    justifyContent: 'space-between'
-  },
-  readyBtnContainer: {
-    width: 60,
-    borderRadius: 3,
-    borderWidth: 1,
-    borderColor: '#999',
-    padding: '0.25rem',
-    cursor: 'pointer',
-    outline: 'none'
-  },
-  readyBtnText: {
-    fontFamily: 'bungee, cursive',
-    lineHeight: "1rem",
-    fontSize: "0.7rem",
-    textAlign: "center"  
+    overflow: 'hidden'
   }
 })
