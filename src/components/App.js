@@ -1,4 +1,4 @@
-import React, { PureComponent, Fragment, createRef } from 'react'
+import React, { PureComponent, createRef } from 'react'
 import { 
   Image, 
   StyleSheet, 
@@ -11,16 +11,44 @@ import { CheckBox } from 'react-native-elements'
 import produce from 'immer'
 import ErrorBoundary from './errorBoundary'
 import CustomInputList from './customInput'
-import SlotMachine from './slotmachine'
-import { findReactElement } from '../utils'
+import SlotMachine from './slotMachine'
+import { NUM_OF_CHARS_IN_ONE_LINE_FOR_TEXT_INPUT, findReactElement } from '../utils'
 import cogito from '../assets/cogito_loading.gif'
 
-const initialItems = [{
+type BBtnProps = {
+  title: string, 
+  onPress: () => void, 
+  disabled: boolean, 
+  confirmColor: string, 
+  leftMargin: number, 
+  onPressOut: () => void
+}
+
+export type item = {
+  label: number,
+  datum: {
+    placeholder: string,
+    value: string
+  }
+}
+
+type AppState = {
+  selectedOption: string,
+  question: string,
+  maxInputIndex: number,
+  numRange: number[],
+  numOfLines: number,
+  items: item[],
+  answer: string,
+  disabled: boolean
+}
+
+const initialItems: item[] = [{
   placeholder: 'item 1',
   value: ''
 }]
 
-export const BottomButton = ({ title, onPress, disabled, confirmColor, leftMargin, onPressOut }) => (
+export const BottomButton = ({ title, onPress, disabled, confirmColor, leftMargin, onPressOut }: BBtnProps) => (
   <View style={leftMargin}>
     <TouchableHighlight
       activeOpacity={0.5} 
@@ -38,12 +66,13 @@ export const BottomButton = ({ title, onPress, disabled, confirmColor, leftMargi
   </View>
 )
 
-export default class App extends PureComponent {
+export default class App extends PureComponent<any, AppState> {
   state = {
     selectedOption: 'custom',
     question: '',
     maxInputIndex: 1,
     numRange: ['', ''],
+    numOfLines: 1,
     items: initialItems,
     answer: '',
     disabled: true
@@ -64,7 +93,7 @@ export default class App extends PureComponent {
 
   handlePickerItemChange = e => {
     const { items } = this.state
-    const { placeholder, value } = e.currentTarget
+    const { currentTarget: { placeholder, value } } = e
     const inputIndex = items.findIndex(input => input.placeholder === placeholder)
     if (inputIndex === items.length - 1) {
       this.addInputItem(placeholder)
@@ -94,8 +123,9 @@ export default class App extends PureComponent {
   }
 
   handleInputChange = e => { // question and numRange
+    e.persist()
     const re = new RegExp('^\\d*$', 'g')
-    const { name, value } = e.currentTarget
+    const { currentTarget: { name, value } } = e
     this.setState(
       produce(draft => {
         if (name === 'from') {
@@ -109,7 +139,19 @@ export default class App extends PureComponent {
         } else {
           draft[name] = value
         }        
-      })
+      }),
+      () => {
+        if (name === 'question') {
+          const { numOfLines } = this.state
+          const { nativeEvent: { target: { selectionEnd }} } = e
+          const denom = Math.ceil(selectionEnd / NUM_OF_CHARS_IN_ONE_LINE_FOR_TEXT_INPUT)
+          if (!denom) {
+            this.setState({ numOfLines: 1 })
+          } else if (denom > numOfLines || denom < numOfLines) {
+            this.setState({ numOfLines: denom })
+          }
+        }        
+      }
     )
   }
   
@@ -163,7 +205,8 @@ export default class App extends PureComponent {
       numRange,
       question, 
       answer,
-      disabled 
+      disabled,
+      numOfLines 
     } = this.state
     return (
       <View style={styles.app}>
@@ -196,9 +239,9 @@ export default class App extends PureComponent {
               placeholderTextColor="orange"
               onChange={this.handleInputChange}
               multiline
+              numberOfLines={numOfLines}
               value={question}
               style={styles.questionText}
-              // onLayout={this.onLoadQuestion}
             />
           </View>    
           {answer !== '' && (
@@ -230,7 +273,7 @@ export default class App extends PureComponent {
           <ErrorBoundary>
             <View style={styles.inputListContainer}>
               {selectedOption === 'custom' ? (
-                <Fragment>
+                <>
                   <Text style={styles.text}>
                     Type Custom Items
                   </Text>
@@ -239,9 +282,9 @@ export default class App extends PureComponent {
                     handlePickerItemChange={this.handlePickerItemChange}
                     handlePickerItemBlur={this.handlePickerItemBlur}
                   />
-                </Fragment>
+                </>
               ) : (
-                <Fragment>
+                <>
                   <Text style={styles.text}>
                     Select Range of Numbers
                   </Text>
@@ -259,7 +302,7 @@ export default class App extends PureComponent {
                       />
                     </View>
                   ))}
-                </Fragment>
+                </>
               )}
             </View>
           </ErrorBoundary>
@@ -268,7 +311,6 @@ export default class App extends PureComponent {
               option={selectedOption}
               items={items}
               numRange={numRange}
-              onSubmitClick={this.handleSubmit}
               disabled={disabled}
               answer={this.answerOn}
             />
@@ -316,12 +358,9 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
   questionText: {
-    width: '80%',
     wordWrap: 'break-word',
     justifyContent: 'center',
     alignSelf: 'center',
-    paddingTop: '2rem',
-    minHeight: '2rem',
     lineHeight: '2rem',
     fontFamily: 'bungee, cursive',
     fontSize: '1.25rem',

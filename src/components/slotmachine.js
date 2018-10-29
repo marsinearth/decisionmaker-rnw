@@ -4,10 +4,25 @@ import Picker from 'rmc-picker/es/Picker'
 import Popup from 'rmc-picker/es/Popup'
 import 'rmc-picker/assets/index.css'
 import 'rmc-picker/assets/popup.css'
-import { BottomButton } from './App'
+import { BottomButton, item } from './App'
+import { MAX_ITEM_LIST_NUM } from '../utils'
 // import throttle from 'lodash.throttle'
 
 // TODO: gotta deal with the structure of this.state.items. you can't deal with the negative labels in current structure
+
+type PickerCompProps = {
+  items: item[],
+  value: string,
+  onChangeValue: () => void
+}
+
+type slotMachineProps = {
+  option: string,
+  items: item[],
+  numRange: number[],
+  disabled: boolean,
+  answer: () => void
+}
 
 const generateArray = async ({ data, startIdx, endIdx, limit, num }) => {
   let init = endIdx >= startIdx ? 0 : num
@@ -28,7 +43,7 @@ const generateArray = async ({ data, startIdx, endIdx, limit, num }) => {
   return { generatedArray, num }
 }
 
-const PickerComp = ({ items, value, onChangeValue, onLoadMore }) => (
+const PickerComp = ({ items, value, onChangeValue }: PickerCompProps) => (
   <Picker
     selectedValue={value}
     onValueChange={onChangeValue}
@@ -57,7 +72,7 @@ const PickerComp = ({ items, value, onChangeValue, onLoadMore }) => (
   </Picker>
 )
 
-export default class SlotMachine extends PureComponent {
+export default class SlotMachine extends PureComponent<slotMachineProps> {
   state = {
     items: [],
     value: 0
@@ -150,15 +165,15 @@ export default class SlotMachine extends PureComponent {
       num = data.length
       startIdx = 0
       endIdx = num
-      limit = num === 0 ? 1000 : Math.floor(1000 / num)
+      limit = num === 0 ? MAX_ITEM_LIST_NUM : Math.floor(MAX_ITEM_LIST_NUM / num)
     } else {
       num = Math.abs(to - from) + 1
       startIdx = Number(from)
       endIdx = Number(to)
       if (endIdx === startIdx) {
-        limit = 1000
+        limit = MAX_ITEM_LIST_NUM
       } else {
-        limit = Math.floor(1000 / Math.abs(endIdx - startIdx))
+        limit = Math.floor(MAX_ITEM_LIST_NUM / Math.abs(endIdx - startIdx))
       }    
       data = await [...Array(endIdx + 1).keys()].filter(key => (
         ![...Array(startIdx).keys()].includes(key)
@@ -181,7 +196,7 @@ export default class SlotMachine extends PureComponent {
               items,
               value,
               onChangeValue: this.onChangeValue,
-              onLoadMore: this.onLoadMore
+              // onLoadMore: this.onLoadMore
             })}
             title="Roll & Pick!!!"
             value={value}
@@ -190,18 +205,6 @@ export default class SlotMachine extends PureComponent {
             disabled={disabled}
             triggerType="onPressOut"
           >       
-            {/* <TouchableHighlight
-              activeOpacity={0.5} 
-              underlayColor="#d7dbdd"
-              disabled={disabled} 
-              onPress={this.onReady}
-            >
-              <View style={styles.readyBtnContainer}>
-                <Text style={[styles.readyBtnText, { color: disabled ? '#888' : '#444' }]}>
-                  Ready
-                </Text>
-              </View>
-            </TouchableHighlight>*/}
             <BottomButton
               title="Ready"
               onPress={this.onReady}

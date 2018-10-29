@@ -5,16 +5,16 @@
   "dependencies": {
     "immer": "^1.7.2",
     "lodash.throttle": "^4.1.1",
-    "react": "^16.6.0",
+    "react": "16.5.1",
     "react-app-rewired": "^1.5.2",
-    "react-art": "^16.6.0",
-    "react-dom": "^16.6.0",
+    "react-art": "16.5.1",
+    "react-dom": "16.5.1",
     "react-github-fork-ribbon": "^0.6.0",
     "react-native": "0.55.4",
     "react-native-elements": "^0.19.1",
     "react-native-vector-icons": "^4.6.0",
     "react-native-web": "^0.9.4",
-    "react-scripts": "1.1.4",
+    "react-scripts": "2.0.5",
     "rmc-dialog": "file:./src/lib/rmc-dialog/",
     "rmc-picker": "file:./src/lib/rmc-picker/"
   },
@@ -28,11 +28,12 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-plugin-transform-react-jsx-source": "^6.22.0",
     "create-react-class": "^15.6.3",
-    "eslint": "^5.7.0",
-    "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-jsx-a11y": "^6.1.2",
-    "eslint-plugin-react": "^7.11.1",
-    "eslint-plugin-react-native": "^3.5.0",
     "react-app-rewire-babel-loader": "^0.1.1"
-  }
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }

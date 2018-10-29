@@ -3,13 +3,11 @@
   "env": {
     "node": true, 
     "es6": true, 
-    "browser": true,
-    "react-native/react-native": true
+    "browser": true
   },
   "plugins": [
     "import",
-    "react",
-    "react-native"
+    "react"
   ],
   "extends": [
     "eslint:recommended",
@@ -17,11 +15,6 @@
   ],
   "rules": {
     "no-console": 0,
-    "react/prop-types": 1,
-    "react-native/no-unused-styles": 2,
-    "react-native/split-platform-components": 2,
-    "react-native/no-inline-styles": 1,
-    "react-native/no-color-literals": 1,
-    "react-native/no-raw-text": 2
+    "react/prop-types": 1
   }
 }
