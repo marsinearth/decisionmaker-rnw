@@ -10,7 +10,7 @@ import {
 import { CheckBox } from 'react-native-elements'
 import produce from 'immer'
 import ErrorBoundary from './errorBoundary'
-import CustomInputList from './customInput'
+import CustomInputList, { inputStyles } from './customInput'
 import SlotMachine from './slotMachine'
 import { NUM_OF_CHARS_IN_ONE_LINE_FOR_TEXT_INPUT, findReactElement } from '../utils'
 import cogito from '../assets/cogito_loading.gif'
@@ -356,6 +356,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 0,
+    marginVertical: '.8rem'
   },
   questionText: {
     wordWrap: 'break-word',
@@ -425,28 +426,6 @@ const styles = StyleSheet.create({
     marginLeft: 10
   },
   readyBtnText: {
-    fontFamily: 'bungee, cursive',
-    lineHeight: "1rem",
-    fontSize: "0.7rem",
-    textAlign: "center"  
-  }
-})
-
-export const inputStyles = StyleSheet.create({
-  inputContainer: {
-    width: 130,
-    height: 'auto',
-    borderWidth: 1,
-    borderRadius: 3,
-    borderColor: 'transparent',
-    shadowOffset: { width: -1, height: -1 },
-    shadowOpacity: 0.8,
-    shadowRadius: 5,
-    marginVertical: '0.125rem',
-    overflow: 'hidden'
-  },
-  inputText: {
-    paddingVertical: '0.25rem',
     fontFamily: 'bungee, cursive',
     lineHeight: "1rem",
     fontSize: "0.7rem",
