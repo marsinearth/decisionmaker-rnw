@@ -4,6 +4,7 @@ import {
   StyleSheet, 
   Text, 
   TextInput,
+  SafeAreaView,
   View,
   TouchableHighlight
 } from 'react-native'
@@ -12,7 +13,7 @@ import produce from 'immer'
 import ErrorBoundary from './errorBoundary'
 import CustomInputList, { inputStyles } from './customInput'
 import SlotMachine from './slotMachine'
-import { NUM_OF_CHARS_IN_ONE_LINE_FOR_TEXT_INPUT, findReactElement } from '../utils'
+import { RATIO_OF_CHARS_MAX_FOR_WIDTH, findReactElement } from '../utils'
 import cogito from '../assets/cogito_loading.gif'
 
 type BBtnProps = {
@@ -142,14 +143,26 @@ export default class App extends PureComponent<any, AppState> {
       }),
       () => {
         if (name === 'question') {
-          const { numOfLines } = this.state
-          const { nativeEvent: { target: { selectionEnd }} } = e
-          const denom = Math.ceil(selectionEnd / NUM_OF_CHARS_IN_ONE_LINE_FOR_TEXT_INPUT)
-          if (!denom) {
-            this.setState({ numOfLines: 1 })
-          } else if (denom > numOfLines || denom < numOfLines) {
-            this.setState({ numOfLines: denom })
-          }
+          let questionDefaultMaxCharsNum = 0
+          const { numOfLines, question } = this.state
+          const { nativeEvent: { target: { selectionEnd }} } = e          
+          const charsArray = question.split('')
+          const specialCharsNum = charsArray.reduce((acc, curr) => {
+            if (/[^\w|\u3131-\uD79D]/gm.test(curr)) {
+              acc++
+            }
+            return acc
+          }, 0)
+          this.questionRef.current.measure((x, y, width) => {
+            questionDefaultMaxCharsNum = Math.ceil(width / RATIO_OF_CHARS_MAX_FOR_WIDTH)
+            const totalLen = Math.ceil(selectionEnd - specialCharsNum + (specialCharsNum / 2))
+            const denom = Math.ceil(totalLen / questionDefaultMaxCharsNum)
+            if (!denom) {
+              this.setState({ numOfLines: 1 })
+            } else if (denom > numOfLines || denom < numOfLines) {
+              this.setState({ numOfLines: denom })
+            }
+          })                              
         }        
       }
     )
@@ -209,7 +222,7 @@ export default class App extends PureComponent<any, AppState> {
       numOfLines 
     } = this.state
     return (
-      <View style={styles.app}>
+      <SafeAreaView style={styles.app}>
         <View style={styles.header}>
           <Image
             accessibilityLabel="React logo"
@@ -299,6 +312,7 @@ export default class App extends PureComponent<any, AppState> {
                         onChange={this.handleInputChange}
                         value={numRange[i]}
                         style={inputStyles.inputText}
+                        keyboardType="numeric"
                       />
                     </View>
                   ))}
@@ -323,7 +337,7 @@ export default class App extends PureComponent<any, AppState> {
             />
           </View>
         </View>
-      </View>
+      </SafeAreaView>
     );
   }
 }
