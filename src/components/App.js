@@ -71,6 +71,7 @@ export default class App extends PureComponent<any, AppState> {
   state = {
     selectedOption: 'custom',
     question: '',
+    questionWidth: 0,
     maxInputIndex: 1,
     numRange: ['', ''],
     numOfLines: 1,
@@ -143,8 +144,7 @@ export default class App extends PureComponent<any, AppState> {
       }),
       () => {
         if (name === 'question') {
-          let questionDefaultMaxCharsNum = 0
-          const { numOfLines, question } = this.state
+          const { numOfLines, question, questionWidth } = this.state
           const { nativeEvent: { target: { selectionEnd }} } = e          
           const charsArray = question.split('')
           const specialCharsNum = charsArray.reduce((acc, curr) => {
@@ -153,19 +153,22 @@ export default class App extends PureComponent<any, AppState> {
             }
             return acc
           }, 0)
-          this.questionRef.current.measure((x, y, width) => {
-            questionDefaultMaxCharsNum = Math.floor(width / RATIO_OF_CHARS_MAX_FOR_WIDTH)
-            const totalLen = Math.ceil(selectionEnd - specialCharsNum + (specialCharsNum / 2))
-            const denom = Math.ceil(totalLen / questionDefaultMaxCharsNum)
-            if (!denom) {
-              this.setState({ numOfLines: 1 })
-            } else if (denom > numOfLines || denom < numOfLines) {
-              this.setState({ numOfLines: denom })
-            }
-          })                              
+          const questionDefaultMaxCharsNum = Math.floor(questionWidth / RATIO_OF_CHARS_MAX_FOR_WIDTH)
+          const totalLen = Math.ceil(selectionEnd - specialCharsNum + (specialCharsNum / 2))
+          const denom = Math.ceil(totalLen / questionDefaultMaxCharsNum)
+          if (!denom) {
+            this.setState({ numOfLines: 1 })
+          } else if (denom > numOfLines || denom < numOfLines) {
+            this.setState({ numOfLines: denom })
+          }                         
         }        
       }
     )
+  }
+  
+  onLayoutChange = e => {
+    const { nativeEvent: { layout: { width }} } = e
+    this.setState({ questionWidth: width })
   }
   
   handleSelectType = e => {
@@ -255,6 +258,7 @@ export default class App extends PureComponent<any, AppState> {
               numberOfLines={numOfLines}
               value={question}
               style={styles.questionText}
+              onLayout={this.onLayoutChange}
             />
           </View>    
           {answer !== '' && (

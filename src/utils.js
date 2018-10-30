@@ -1,4 +1,4 @@
-export const RATIO_OF_CHARS_MAX_FOR_WIDTH: number = 16
+export const RATIO_OF_CHARS_MAX_FOR_WIDTH: number = 17
 
 export const MAX_ITEM_LIST_NUM: number = 1000
 
