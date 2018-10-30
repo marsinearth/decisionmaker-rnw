@@ -154,7 +154,7 @@ export default class App extends PureComponent<any, AppState> {
             return acc
           }, 0)
           this.questionRef.current.measure((x, y, width) => {
-            questionDefaultMaxCharsNum = Math.ceil(width / RATIO_OF_CHARS_MAX_FOR_WIDTH)
+            questionDefaultMaxCharsNum = Math.floor(width / RATIO_OF_CHARS_MAX_FOR_WIDTH)
             const totalLen = Math.ceil(selectionEnd - specialCharsNum + (specialCharsNum / 2))
             const denom = Math.ceil(totalLen / questionDefaultMaxCharsNum)
             if (!denom) {
