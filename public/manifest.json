@@ -1,11 +1,22 @@
 {
   "short_name": "DM-RNW",
   "name": "Decision Maker on React Native Web",
+  "description": "A semi automatic slot machine style decision maker app.",
   "icons": [
     {
       "src": "favicon.ico",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
+    },
+    {
+      "src": "icon192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon512.png",
+      "sizes": "512x512",
+      "type": "image/png"
     }
   ],
   "start_url": "./index.html",
