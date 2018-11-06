@@ -228,7 +228,7 @@ export default class App extends PureComponent<any, AppState> {
       <SafeAreaView style={styles.app}>
         <View style={styles.header}>
           <Image
-            accessibilityLabel="React logo"
+            accessibilityLabel="logo"
             source={cogito}
             resizeMode="contain"
             style={styles.logo}
