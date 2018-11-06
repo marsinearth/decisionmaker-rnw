@@ -435,7 +435,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     borderWidth: 1,
     borderColor: '#999',
-    padding: '0.2rem',
+    padding: '0.4rem',
     cursor: 'pointer',
     outline: 'none',
     boxSizing: 'border-box'
