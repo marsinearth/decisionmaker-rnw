@@ -11,7 +11,7 @@ import {
 import { CheckBox } from 'react-native-elements'
 import produce from 'immer'
 import ErrorBoundary from './errorBoundary'
-import CustomInputList, { inputStyles } from './customInput'
+import SelectedOptions from './selectedOptions'
 import SlotMachine from './slotMachine'
 import { RATIO_OF_CHARS_MAX_FOR_WIDTH, findReactElement } from '../utils'
 import cogito from '../assets/cogito_loading.gif'
@@ -83,14 +83,26 @@ export default class App extends PureComponent<any, AppState> {
   questionRef = createRef()
 
   componentDidUpdate(prevProps, prevState) {
-    const { items, items: { length: itemsLen }, numRange, numRange: [from, to] } = this.state
-    const { items: { length: prevItemsLen }, numRange: [prevFrom, prevTo]} = prevState
+    const { selectedOption, items, items: { length: itemsLen }, numRange, numRange: [from, to] } = this.state
+    const { selectedOption: prevSelectedOption,
+    items: { length: prevItemsLen }, numRange: [prevFrom, prevTo]} = prevState
     if (itemsLen !== prevItemsLen) {
       this.setState({ disabled: items[0].value.trim() === '' })
     }
     if (from !== prevFrom || to !== prevTo) {
       this.setState({ disabled: numRange.some(range => range === '') })
     }  
+    if (selectedOption === 'T/F' && prevSelectedOption !== selectedOption) {
+    	this.setState({
+    		items: [{
+    			placeholder: 'True',
+    			value: 'True'
+    		}, {
+    			placeholder: 'False',
+    			value: 'False'
+    		}]
+    	})
+    }
   }
 
   handlePickerItemChange = e => {
@@ -144,26 +156,34 @@ export default class App extends PureComponent<any, AppState> {
       }),
       () => {
         if (name === 'question') {
-          const { numOfLines, question, questionWidth } = this.state
-          const { nativeEvent: { target: { selectionEnd }} } = e          
-          const charsArray = question.split('')
-          const specialCharsNum = charsArray.reduce((acc, curr) => {
-            if (/[^\w|\u3131-\uD79D]/gm.test(curr)) {
-              acc++
-            }
-            return acc
-          }, 0)
-          const questionDefaultMaxCharsNum = Math.floor(questionWidth / RATIO_OF_CHARS_MAX_FOR_WIDTH)
-          const totalLen = Math.ceil(selectionEnd - specialCharsNum + (specialCharsNum / 2))
-          const denom = Math.ceil(totalLen / questionDefaultMaxCharsNum)
-          if (!denom) {
-            this.setState({ numOfLines: 1 })
-          } else if (denom > numOfLines || denom < numOfLines) {
-            this.setState({ numOfLines: denom })
-          }                         
+       		const { nativeEvent: { target: { selectionEnd }} } = e
+       		this.questionLayoutChange(selectionEnd)         
         }        
       }
     )
+  }
+  
+  questionLayoutChange = selectionEnd => {
+  	const { 
+  		numOfLines, 
+  		question, 
+  		questionWidth 
+  	} = this.state
+    const charsArray = question.split('')
+    const specialCharsNum = charsArray.reduce((acc, curr) => {
+      if (/[^\w|\u3131-\uD79D]/gm.test(curr)) {
+        acc++
+      }
+      return acc
+    }, 0)
+    const questionDefaultMaxCharsNum = Math.floor(questionWidth / RATIO_OF_CHARS_MAX_FOR_WIDTH)
+    const totalLen = Math.ceil(selectionEnd - specialCharsNum + (specialCharsNum / 2))
+    const denom = Math.ceil(totalLen / questionDefaultMaxCharsNum)
+    if (!denom) {
+      this.setState({ numOfLines: 1 })
+    } else if (denom > numOfLines || denom < numOfLines) {
+      this.setState({ numOfLines: denom })
+    }       
   }
   
   onLayoutChange = e => {
@@ -224,6 +244,15 @@ export default class App extends PureComponent<any, AppState> {
       disabled,
       numOfLines 
     } = this.state
+    const selectedOptionsProps = {
+	    selectedOption,
+	    items,
+	    numRange,
+	    textStyle: styles.text,
+	    handleInputChange: this.handleInputChange,
+	    handlePickerItemChange: this.handlePickerItemChange,
+	    handlePickerItemBlur: this.handlePickerItemBlur
+    }
     return (
       <SafeAreaView style={styles.app}>
         <View style={styles.header}>
@@ -272,7 +301,7 @@ export default class App extends PureComponent<any, AppState> {
             Select Type
           </Text>          
           <View style={styles.selectTypeContainer}>
-            {['custom', 'numbers'].map(type => (
+            {['T/F', 'custom', 'numbers'].map(type => (
               <CheckBox
                 key={type}
                 title={type}
@@ -289,39 +318,8 @@ export default class App extends PureComponent<any, AppState> {
           </View>
           <ErrorBoundary>
             <View style={styles.inputListContainer}>
-              {selectedOption === 'custom' ? (
-                <>
-                  <Text style={styles.text}>
-                    Type Custom Items
-                  </Text>
-                  <CustomInputList
-                    items={items}
-                    handlePickerItemChange={this.handlePickerItemChange}
-                    handlePickerItemBlur={this.handlePickerItemBlur}
-                  />
-                </>
-              ) : (
-                <>
-                  <Text style={styles.text}>
-                    Select Range of Numbers
-                  </Text>
-                  {['from', 'to'].map((adverb, i) => (
-                    <View
-                      key={adverb}
-                      style={inputStyles.inputContainer}
-                    >
-                      <TextInput                      
-                        name={adverb}
-                        placeholder={`Number ${adverb}`}
-                        onChange={this.handleInputChange}
-                        value={numRange[i]}
-                        style={inputStyles.inputText}
-                        keyboardType="numeric"
-                      />
-                    </View>
-                  ))}
-                </>
-              )}
+              <SelectedOptions {...selectedOptionsProps}
+              /> 
             </View>
           </ErrorBoundary>
           <View style={styles.readyBtnsContainer}>
@@ -401,7 +399,7 @@ const styles = StyleSheet.create({
   },
   selectTypeContainer: {
     flexDirection: 'row',
-    justifyContent: 'center'
+    justifyContent: 'space-around'
   },
   selectTypeButtonStyle: {
     alignItems: 'center',

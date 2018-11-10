@@ -1,19 +1,20 @@
 import React, { PureComponent } from 'react'
 import { View, ScrollView, StyleSheet, Keyboard } from 'react-native'
+import throttle from 'lodash.throttle'
 import Picker from 'rmc-picker/es/Picker'
 import Popup from 'rmc-picker/es/Popup'
 import 'rmc-picker/assets/index.css'
 import 'rmc-picker/assets/popup.css'
 import { BottomButton, item } from './App'
 import { MAX_ITEM_LIST_NUM } from '../utils'
-// import throttle from 'lodash.throttle'
 
 // TODO: gotta deal with the structure of this.state.items. you can't deal with the negative labels in current structure
 
 type PickerCompProps = {
   items: item[],
   value: string,
-  onChangeValue: () => void
+  onChangeValue: () => void,
+  onLoadMore: () => void
 }
 
 type slotMachineProps = {
@@ -24,7 +25,7 @@ type slotMachineProps = {
   answer: () => void
 }
 
-const generateArray = async ({ data, startIdx, endIdx, limit, num }) => {
+const generateArray = async ({ data, startIdx, endIdx, limit, num, more }) => {
   let init = endIdx >= startIdx ? 0 : num
   const generatedArray = []
   for (let j = 0; j <= limit; j++) {
@@ -34,7 +35,7 @@ const generateArray = async ({ data, startIdx, endIdx, limit, num }) => {
       endIdx >= startIdx ? i++ : i--
     ) {
       generatedArray.push({
-        label: init,
+        label: more ? 'more${init}' : init,
         datum: data[i]
       });
       init++
@@ -43,26 +44,26 @@ const generateArray = async ({ data, startIdx, endIdx, limit, num }) => {
   return { generatedArray, num }
 }
 
-const PickerComp = ({ items, value, onChangeValue }: PickerCompProps) => (
+const PickerComp = ({ items, value, onChangeValue, onLoadMore }: PickerCompProps) => (
   <Picker
     selectedValue={value}
     onValueChange={onChangeValue}
-    /* onScrollChange={
-        throttle(
-          (scrollHeight) => {
-            // console.log('%c scrollHeight: ', 'background-color:purple; color:#FFF;', scrollHeight)
-            if (scrollHeight <= items[0].label + 200) {
-              console.log('%c items[0].label: ', 'background-color:purple; color:#FFF;', items[0].label)
-              onLoadMore('prev')
-            } else if (scrollHeight >= items.length - 200) {
-              console.log('%c items.length - 200: ', 'background-color:purple; color:#FFF;', items.length - 200)
-              onLoadMore('next')
-            }
-          },
-          2000000,
-          { trailing: false }
-        )        
-    }*/
+    onScrollChange={
+      throttle(
+        (scrollHeight) => {
+          console.log('%c scrollHeight: ', 'background-color:purple; color:#FFF;', scrollHeight)
+          if (scrollHeight <= 20) {
+            console.log('%c items[0].label: ', 'background-color:purple; color:#FFF;', items[0].label)
+            onLoadMore('prev')
+          } else if (scrollHeight >= items.length - 20) {
+            console.log('%c items.length - 200: ', 'background-color:purple; color:#FFF;', items.length - 200)
+            onLoadMore('next')
+          }
+        },
+        2000,
+        { trailing: false }
+      )        
+    }
   >
     {items.map(({ label, datum }, index) => (
       <Picker.Item key={index} value={label}>
@@ -91,14 +92,14 @@ export default class SlotMachine extends PureComponent<slotMachineProps> {
     this.setState({ items: [] }, cbFunc)
   }
 
-  onItemsCalculate = async (order) => {
+  onItemsCalculate = async (order, more = false) => {
     const { num, ...processedData } = await this.dataPrepare()
     const { length: itemsLen } = this.state.items
     let newNum = itemsLen + num
     if (order === 'prev') {
       newNum = -(Math.abs(itemsLen) + num)
     }
-    return await generateArray({ num: newNum, ...processedData })
+    return await generateArray({ num: newNum, ...processedData, more })
   }
 
   onReady = () => {
@@ -123,7 +124,7 @@ export default class SlotMachine extends PureComponent<slotMachineProps> {
   }
 
   onLoadMore = async (order) => {
-    const { generatedArray } = await this.onItemsCalculate(order)
+    const { generatedArray } = await this.onItemsCalculate(order, true)
     console.log('generatedArray: ', generatedArray)
     this.setState(prevState => {
       if (order === 'prev') {
@@ -160,8 +161,11 @@ export default class SlotMachine extends PureComponent<slotMachineProps> {
   dataPrepare = async () => {
     const { option, items, numRange: [from, to] } = this.props
     let data, num, startIdx, endIdx, limit
-    if (option === 'custom') {
-      data = await items.slice(0, -1).map(item => item.value)
+    if (option !== 'numbers') {
+    	const refinedItems = option ==='custom' 
+    		? items.slice(0, -1)
+    		: items
+      data = await refinedItems.map(item => item.value)
       num = data.length
       startIdx = 0
       endIdx = num
