@@ -35,7 +35,7 @@ const generateArray = async ({ data, startIdx, endIdx, limit, num, more }) => {
       endIdx >= startIdx ? i++ : i--
     ) {
       generatedArray.push({
-        label: more ? 'more${init}' : init,
+        label: more ? `more${init}` : init,
         datum: data[i]
       });
       init++
@@ -162,9 +162,9 @@ export default class SlotMachine extends PureComponent<slotMachineProps> {
     const { option, items, numRange: [from, to] } = this.props
     let data, num, startIdx, endIdx, limit
     if (option !== 'numbers') {
-    	const refinedItems = option ==='custom' 
-    		? items.slice(0, -1)
-    		: items
+      const refinedItems = option ==='custom' 
+        ? items.slice(0, -1)
+        : items
       data = await refinedItems.map(item => item.value)
       num = data.length
       startIdx = 0

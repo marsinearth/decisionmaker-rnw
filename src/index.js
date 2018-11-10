@@ -1,4 +1,4 @@
-import React, { Fragment } from "react"
+import React from "react"
 import ReactDOM from "react-dom"
 import GitHubForkRibbon from "react-github-fork-ribbon";
 import App from "./components/App"
@@ -16,10 +16,10 @@ const ForkRibbon = () => (
 )
 
 const Wrapper = () => (
-  <Fragment>
+  <>
     <ForkRibbon />
     <App />
-  </Fragment>
+  </>
 )
 
 ReactDOM.render(<Wrapper />, document.getElementById("root"));
@@ -38,16 +38,19 @@ const injectFonts = () => {
 
   // fontAwesome
   const fontAwesomeFont = require("react-native-vector-icons/Fonts/FontAwesome.ttf");
-  const fontAwesomeFontStyles = `@font-face {
-src: url(${fontAwesomeFont});
-font-family: 'FontAwesome';
-}`;
-    style.type = "text/css";
-    if (style.styleSheet) {
-        style.styleSheet.cssText = fontAwesomeFontStyles;
-    } else {
-        style.appendChild(document.createTextNode(fontAwesomeFontStyles));
-    }
+  const fontBungee = require("./assets/fonts/Bungee/Bungee-Regular.ttf");
+  const fontEczar = require("./assets/fonts/Eczar/Eczar-SemiBold.ttf");
+
+  const fontAwesomeFontStyles = `@font-face { font-family: 'FontAwesome'; src: url(${fontAwesomeFont}); } 
+    @font-face { font-family: 'Bungee'; src: url(${fontBungee}); }
+    @font-face { font-family: 'Eczar'; src: url(${fontEczar}); }
+  `;
+  style.type = "text/css";
+  if (style.styleSheet) {
+      style.styleSheet.cssText = fontAwesomeFontStyles;
+  } else {
+      style.appendChild(document.createTextNode(fontAwesomeFontStyles));
+  }
 /*
   // material-community
   const materialCommunityFont = require("react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf");
@@ -88,7 +91,7 @@ font-family: 'Octions';
         style.appendChild(document.createTextNode(octiconsFontStyles));
     }
 */
-    document.head.appendChild(style);
+  document.head.appendChild(style);
 };
 
 injectFonts();

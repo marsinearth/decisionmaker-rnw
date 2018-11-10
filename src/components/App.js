@@ -1,8 +1,8 @@
 import React, { PureComponent, createRef } from 'react'
-import { 
-  Image, 
-  StyleSheet, 
-  Text, 
+import {
+  Image,
+  StyleSheet,
+  Text,
   TextInput,
   SafeAreaView,
   View,
@@ -17,11 +17,11 @@ import { RATIO_OF_CHARS_MAX_FOR_WIDTH, findReactElement } from '../utils'
 import cogito from '../assets/cogito_loading.gif'
 
 type BBtnProps = {
-  title: string, 
-  onPress: () => void, 
-  disabled: boolean, 
-  confirmColor: string, 
-  leftMargin: number, 
+  title: string,
+  onPress: () => void,
+  disabled: boolean,
+  confirmColor: string,
+  leftMargin: number,
   onPressOut: () => void
 }
 
@@ -60,9 +60,9 @@ const initItems: item[] = [{
 export const BottomButton = ({ title, onPress, disabled, confirmColor, leftMargin, onPressOut }: BBtnProps) => (
   <View style={leftMargin}>
     <TouchableHighlight
-      activeOpacity={0.5} 
+      activeOpacity={0.5}
       underlayColor="#d7dbdd"
-      disabled={disabled} 
+      disabled={disabled}
       onPress={onPress}
       onPressOut={onPressOut}
     >
@@ -85,7 +85,7 @@ export default class App extends PureComponent<any, AppState> {
     numOfLines: 1,
     items: initTFItems,
     answer: '',
-    disabled: true
+    disabled: false
   }
 
   questionRef = createRef()
@@ -99,15 +99,15 @@ export default class App extends PureComponent<any, AppState> {
     }
     if (from !== prevFrom || to !== prevTo) {
       this.setState({ disabled: numRange.some(range => range === '') })
-    }  
+    }
     if (selectedOption === 'T/F' && prevSelectedOption !== selectedOption) {
-    	this.setState({
-    		items: initTFItems
-    	})
+      this.setState({
+        items: initTFItems
+      })
     } else if (selectedOption === 'custom' && prevSelectedOption !== selectedOption) {
-    	this.setState({
-    		items: initItems
-    	})
+      this.setState({
+        items: initItems
+      })
     }
   }
 
@@ -128,7 +128,7 @@ export default class App extends PureComponent<any, AppState> {
       })
     )
   }
-  
+
   handlePickerItemBlur = e => {
     const { items } = this.state
     const { currentTarget: { placeholder, value } = {}} = e
@@ -139,7 +139,7 @@ export default class App extends PureComponent<any, AppState> {
           draft.items.splice(inputIndex, 1)
         })
       )
-    } 
+    }
   }
 
   handleInputChange = e => { // question and numRange
@@ -158,23 +158,23 @@ export default class App extends PureComponent<any, AppState> {
           }
         } else {
           draft[name] = value
-        }        
+        }
       }),
       () => {
         if (name === 'question') {
-       		const { nativeEvent: { target: { selectionEnd }} } = e
-       		this.questionLayoutChange(selectionEnd)         
-        }        
+          const { nativeEvent: { target: { selectionEnd }} } = e
+          this.questionLayoutChange(selectionEnd)
+        }
       }
     )
   }
-  
+
   questionLayoutChange = selectionEnd => {
-  	const { 
-  		numOfLines, 
-  		question, 
-  		questionWidth 
-  	} = this.state
+    const {
+      numOfLines,
+      question,
+      questionWidth
+    } = this.state
     const charsArray = question.split('')
     const specialCharsNum = charsArray.reduce((acc, curr) => {
       if (/[^\w|\u3131-\uD79D]/gm.test(curr)) {
@@ -189,17 +189,17 @@ export default class App extends PureComponent<any, AppState> {
       this.setState({ numOfLines: 1 })
     } else if (denom > numOfLines || denom < numOfLines) {
       this.setState({ numOfLines: denom })
-    }       
+    }
   }
-  
+
   onLayoutChange = e => {
     const { nativeEvent: { layout: { width }} } = e
     this.setState({ questionWidth: width })
   }
-  
+
   handleSelectType = e => {
     const { currentTarget } = e
-    const extractedCurrentTarget = findReactElement(currentTarget) 
+    const extractedCurrentTarget = findReactElement(currentTarget)
     let name = 'custom'
     if (process.env.NODE_ENV === 'production') {
       ({ memoizedProps: { name }} = extractedCurrentTarget)
@@ -238,28 +238,28 @@ export default class App extends PureComponent<any, AppState> {
     } else if (selectedOption === 'custom') {
       this.setState({ items: initItems })
     } else {
-    	this.setState({ items: initTFItems })
+      this.setState({ items: initTFItems })
     }
   }
 
   render() {
-    const { 
-      items, 
-      selectedOption, 
+    const {
+      items,
+      selectedOption,
       numRange,
-      question, 
+      question,
       answer,
       disabled,
-      numOfLines 
+      numOfLines
     } = this.state
     const selectedOptionsProps = {
-	    selectedOption,
-	    items,
-	    numRange,
-	    textStyle: styles.text,
-	    handleInputChange: this.handleInputChange,
-	    handlePickerItemChange: this.handlePickerItemChange,
-	    handlePickerItemBlur: this.handlePickerItemBlur
+      selectedOption,
+      items,
+      numRange,
+      textStyle: styles.text,
+      handleInputChange: this.handleInputChange,
+      handlePickerItemChange: this.handlePickerItemChange,
+      handlePickerItemBlur: this.handlePickerItemBlur
     }
     return (
       <SafeAreaView style={styles.app}>
@@ -270,19 +270,17 @@ export default class App extends PureComponent<any, AppState> {
             resizeMode="contain"
             style={styles.logo}
           />
-          <Text 
+          <Text
             style={styles.title}
             accessibilityRole="heading"
             aria-level="2"
           >
-            Decision Maker on
-            {"\n"}
-            React Native for Web
+            {`Decision Maker on\nReact Native for Web`}
           </Text>
         </View>
         <View style={styles.mainContainer}>
           <Text style={styles.text}>
-            The question
+            {'The question'}
           </Text>
           <View style={styles.questionContainer}>
             <TextInput
@@ -297,7 +295,7 @@ export default class App extends PureComponent<any, AppState> {
               style={styles.questionText}
               onLayout={this.onLayoutChange}
             />
-          </View>    
+          </View>
           {answer !== '' && (
             <View style={styles.answerContainer}>
               <Text style={styles.answerText}>
@@ -306,10 +304,10 @@ export default class App extends PureComponent<any, AppState> {
             </View>
           )}
           <Text style={styles.text}>
-            Select Type
-          </Text>          
+            {'Select Type'}
+          </Text>
           <View style={styles.selectTypeContainer}>
-            {['T/F', 'custom', 'numbers'].map(type => (
+            {['T/F', 'numbers', 'custom'].map(type => (
               <CheckBox
                 key={type}
                 title={type}
@@ -326,8 +324,7 @@ export default class App extends PureComponent<any, AppState> {
           </View>
           <ErrorBoundary>
             <View style={styles.inputListContainer}>
-              <SelectedOptions {...selectedOptionsProps}
-              /> 
+              <SelectedOptions {...selectedOptionsProps} />
             </View>
           </ErrorBoundary>
           <View style={styles.readyBtnsContainer}>
@@ -342,7 +339,7 @@ export default class App extends PureComponent<any, AppState> {
               title="Reset"
               onPress={this.resetItems}
               confirmColor="#AD5A51"
-              disabled={disabled}
+              disabled={selectedOption === 'T/F' || disabled}
               leftMargin={styles.leftMargin}
             />
           </View>
@@ -362,7 +359,7 @@ const styles = StyleSheet.create({
     height: 130
   },
   header: {
-    height: 'auto',    
+    height: 'auto',
   },
   title: {
     fontFamily: 'bungee, cursive',
@@ -403,21 +400,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginVertical: "0.3rem",
     color: '#f08080',
-    textAlign: "center"   
+    textAlign: "center"
   },
   selectTypeContainer: {
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-around'
   },
   selectTypeButtonStyle: {
     alignItems: 'center',
     backgroundColor: 'transparent',
-    borderWidth: 0
+    borderWidth: 0,
+    padding: 0
   },
   selectTypeTextStyle: {
     fontFamily: 'bungee, cursive',
     fontSize: "1rem",
-    textAlign: "center"    
+    textAlign: "center"
   },
   text: {
     fontFamily: 'bungee, cursive',
@@ -425,7 +424,7 @@ const styles = StyleSheet.create({
     fontSize: "0.85rem",
     marginVertical: "0.3rem",
     color: '#888',
-    textAlign: "center"    
+    textAlign: "center"
   },
   inputListContainer: {
     justifyContent: 'center',
@@ -453,6 +452,6 @@ const styles = StyleSheet.create({
     fontFamily: 'bungee, cursive',
     lineHeight: "1rem",
     fontSize: "0.7rem",
-    textAlign: "center"  
+    textAlign: "center"
   }
 })

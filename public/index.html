@@ -2,15 +2,20 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, max-scale=5.0, user-scalable=no, viewport-fit=contain">
+    <meta name="Description" content="Decision Maker by Scrolling options">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no, viewport-fit=contain">
     <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <!--
       manifest.json provides metadata used when your web app is added to the
       homescreen on Android. See https://developers.google.com/web/fundamentals/engage-and-retain/web-app-manifest/
     -->
+    
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
     <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Bungee|Eczar:400,700">
+    <link rel="apple-touch-icon" href="cogito_loading_192.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="cogito_loading_192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="cogito_loading_512.png">
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
@@ -38,4 +43,30 @@
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
   </body>
+  <script>
+    function visibilityHandler(hidden) {
+      var hash = '#bg';
+      
+      if (hidden && !window.location.hash) {
+        window.history.replaceState(null, null, window.location + hash);
+      } else if (!hidden && window.location.hash == hash) {
+        var l = '' + window.location;
+        window.history.replaceState(null, null, l.substr(0, l.length - hash.length));
+      }
+    }
+
+    var hidden, visibilityChange; 
+    if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and later support 
+      hidden = "hidden";
+      visibilityChange = "visibilitychange";
+    } else if (typeof document.msHidden !== "undefined") {
+      hidden = "msHidden";
+      visibilityChange = "msvisibilitychange";
+    } else if (typeof document.webkitHidden !== "undefined") {
+      hidden = "webkitHidden";
+      visibilityChange = "webkitvisibilitychange";
+    }
+    document.addEventListener(visibilityChange, visibilityHandler(hidden), false);
+    visibilityHandler();
+  </script>
 </html>
