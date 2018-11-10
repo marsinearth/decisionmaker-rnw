@@ -44,7 +44,15 @@ type AppState = {
   disabled: boolean
 }
 
-const initialItems: item[] = [{
+const initTFItems: item[] = [{
+	placeholder: 'True',
+	value: 'True'
+}, {
+	placeholder: 'False',
+	value: 'False'
+}]
+
+const initItems: item[] = [{
   placeholder: 'item 1',
   value: ''
 }]
@@ -69,13 +77,13 @@ export const BottomButton = ({ title, onPress, disabled, confirmColor, leftMargi
 
 export default class App extends PureComponent<any, AppState> {
   state = {
-    selectedOption: 'custom',
+    selectedOption: 'T/F',
     question: '',
     questionWidth: 0,
     maxInputIndex: 1,
     numRange: ['', ''],
     numOfLines: 1,
-    items: initialItems,
+    items: initTFItems,
     answer: '',
     disabled: true
   }
@@ -94,13 +102,11 @@ export default class App extends PureComponent<any, AppState> {
     }  
     if (selectedOption === 'T/F' && prevSelectedOption !== selectedOption) {
     	this.setState({
-    		items: [{
-    			placeholder: 'True',
-    			value: 'True'
-    		}, {
-    			placeholder: 'False',
-    			value: 'False'
-    		}]
+    		items: initTFItems
+    	})
+    } else if (selectedOption === 'custom' && prevSelectedOption !== selectedOption) {
+    	this.setState({
+    		items: initItems
     	})
     }
   }
@@ -229,9 +235,11 @@ export default class App extends PureComponent<any, AppState> {
     const { selectedOption } = this.state
     if (selectedOption === 'numbers') {
       this.setState({ numRange: ['', ''] })
+    } else if (selectedOption === 'custom') {
+      this.setState({ items: initItems })
     } else {
-      this.setState({ items: initialItems })
-    }    
+    	this.setState({ items: initTFItems })
+    }
   }
 
   render() {
