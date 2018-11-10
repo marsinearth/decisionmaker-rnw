@@ -257,7 +257,7 @@ export default class App extends PureComponent<any, AppState> {
       <SafeAreaView style={styles.app}>
         <View style={styles.header}>
           <Image
-            accessibilityLabel="React logo"
+            accessibilityLabel="logo"
             source={cogito}
             resizeMode="contain"
             style={styles.logo}
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     borderWidth: 1,
     borderColor: '#999',
-    padding: '0.2rem',
+    padding: '0.4rem',
     cursor: 'pointer',
     outline: 'none',
     boxSizing: 'border-box'
