@@ -43,30 +43,4 @@
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
   </body>
-  <script>
-    function visibilityHandler(hidden) {
-      var hash = '#bg';
-      
-      if (hidden && !window.location.hash) {
-        window.history.replaceState(null, null, window.location + hash);
-      } else if (!hidden && window.location.hash == hash) {
-        var l = '' + window.location;
-        window.history.replaceState(null, null, l.substr(0, l.length - hash.length));
-      }
-    }
-
-    var hidden, visibilityChange; 
-    if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and later support 
-      hidden = "hidden";
-      visibilityChange = "visibilitychange";
-    } else if (typeof document.msHidden !== "undefined") {
-      hidden = "msHidden";
-      visibilityChange = "msvisibilitychange";
-    } else if (typeof document.webkitHidden !== "undefined") {
-      hidden = "webkitHidden";
-      visibilityChange = "webkitvisibilitychange";
-    }
-    document.addEventListener(visibilityChange, visibilityHandler(hidden), false);
-    visibilityHandler();
-  </script>
 </html>

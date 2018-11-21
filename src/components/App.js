@@ -13,7 +13,7 @@ import produce from 'immer'
 import ErrorBoundary from './errorBoundary'
 import SelectedOptions from './selectedOptions'
 import SlotMachine from './slotMachine'
-import { RATIO_OF_CHARS_MAX_FOR_WIDTH, findReactElement } from '../utils'
+import { RATIO_OF_CHARS_MAX_FOR_WIDTH, findReactElement, MAX_ITEM_LIST_NUM } from '../utils'
 import cogito from '../assets/cogito_loading.gif'
 
 type BBtnProps = {
@@ -149,11 +149,15 @@ export default class App extends PureComponent<any, AppState> {
     this.setState(
       produce(draft => {
         if (name === 'from') {
-          if (re.test(value)) {
+          if (value >= MAX_ITEM_LIST_NUM) {
+            alert(`input number cannot be greater than ${MAX_ITEM_LIST_NUM}`)
+          } else if (re.test(value)) {
             draft.numRange[0] = value
           }
         } else if (name === 'to') {
-          if (re.test(value)) {
+          if (value >= MAX_ITEM_LIST_NUM) {
+            alert(`input number cannot be greater than ${MAX_ITEM_LIST_NUM}`)
+          } else if (re.test(value)) {
             draft.numRange[1] = value
           }
         } else {
