@@ -3,9 +3,13 @@ const fs = require("fs");
 // const { injectBabelPlugin } = require("react-app-rewired");
 
 const rewireBabelLoader = require("react-app-rewire-babel-loader");
+const {
+  rewireWorkboxInject,
+  defaultInjectConfig,
+} = require("react-app-rewire-workbox");
 
 const appDirectory = fs.realpathSync(process.cwd());
-const resolveApp = relativePath => path.resolve(appDirectory, relativePath);
+const resolveApp = (relativePath) => path.resolve(appDirectory, relativePath);
 
 module.exports = function override(config, env) {
   // console.log(JSON.stringify(config, null, 2));
@@ -21,7 +25,15 @@ module.exports = function override(config, env) {
   // else fileLoader.include.push(vectorIcons);
 
   // transpile libraries
+
+  const workboxConfig = {
+    ...defaultInjectConfig,
+    swSrc: path.join(__dirname, "src", "workbox-strategy.js"),
+    maximumFileSizeToCacheInBytes: 7 * 1024 * 1024,
+  };
+
   config = rewireBabelLoader.include(config, elements, vectorIcons);
+  config = rewireWorkboxInject(workboxConfig)(config, env);
 
   return config;
 };
