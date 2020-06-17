@@ -1,22 +1,24 @@
-import React from "react";
-import { TextInput, View, Text } from "react-native";
 import CustomInputList, { inputStyles } from "./customInput";
+import { Text, TextInput, View } from "react-native";
+
+import React from "react";
 
 const SelectedOptions = ({
+  theme,
   selectedOption,
   textStyle,
   items,
   numRange,
   handleInputChange,
   handlePickerItemChange,
-  handlePickerItemBlur
+  handlePickerItemBlur,
 }) => {
   switch (selectedOption) {
     case "T/F":
       return (
         <>
           <Text style={textStyle}>{"True / False"}</Text>
-          <CustomInputList items={items} fixed />
+          <CustomInputList items={items} theme={theme} fixed />
         </>
       );
     case "numbers":
@@ -24,13 +26,24 @@ const SelectedOptions = ({
         <>
           <Text style={textStyle}>{"Select Range of Numbers"}</Text>
           {["from", "to"].map((adverb, i) => (
-            <View key={adverb} style={inputStyles.inputContainer}>
+            <View
+              key={adverb}
+              style={[
+                inputStyles.inputContainer,
+                { shadowColor: theme === "dark" ? "#dcdcdc" : "#2e2e2e" },
+              ]}
+            >
               <TextInput
                 name={adverb}
                 placeholder={`Number ${adverb}`}
                 onChange={handleInputChange}
                 value={numRange[i]}
-                style={inputStyles.inputText}
+                style={[
+                  inputStyles.inputText,
+                  {
+                    color: theme === "dark" ? "#dcdcdc" : "black",
+                  },
+                ]}
                 keyboardType="numeric"
               />
             </View>
@@ -43,6 +56,7 @@ const SelectedOptions = ({
           <Text style={textStyle}>{"Type Custom Items"}</Text>
           <CustomInputList
             items={items}
+            theme={theme}
             handlePickerItemChange={handlePickerItemChange}
             handlePickerItemBlur={handlePickerItemBlur}
           />

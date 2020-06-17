@@ -15,6 +15,52 @@ const ForkRibbon = () => (
   </GitHubForkRibbon>
 );
 
+const injectBody = () => {
+  const isDark =
+    window.matchMedia &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+  document.documentElement.setAttribute(
+    "data-theme",
+    isDark ? "dark" : "light"
+  );
+
+  const cssText = `html {
+    background-color: #eef4f7;
+  } 
+  html[data-theme='dark'] {
+    background-color: black;
+
+    textarea[name='question'] {
+      color: white;
+    }
+
+    .rmc-picker-popup {
+      background-color: black;
+    }
+    .rmc-picker-mask {
+      background-image: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.95),
+        rgba(0, 0, 0, 0.6)
+      ),
+      linear-gradient(to top, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.6))
+    }
+  }
+
+  
+  `;
+
+  const style = document.createElement("style");
+  style.type = "text/css";
+  if (style.styleSheet) {
+    style.styleSheet.cssText = cssText;
+  } else {
+    style.appendChild(document.createTextNode(cssText));
+  }
+  document.head.appendChild(style);
+};
+
 const injectFonts = () => {
   const style = document.createElement("style");
   // fontAwesome
@@ -35,6 +81,7 @@ const injectFonts = () => {
   document.head.appendChild(style);
 };
 
+injectBody();
 injectFonts();
 
 const AppStart = () => {

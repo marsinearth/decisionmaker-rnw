@@ -21,6 +21,7 @@ type PickerCompProps = {
 };
 
 type slotMachineProps = {
+  theme: "light" | "dark",
   option: string,
   items: item[],
   numRange: number[],
@@ -210,7 +211,7 @@ export default class SlotMachine extends PureComponent<slotMachineProps> {
   };
 
   render() {
-    const { disabled } = this.props;
+    const { disabled, theme } = this.props;
     const { items, value } = this.state;
     return (
       <ScrollView>
@@ -235,7 +236,7 @@ export default class SlotMachine extends PureComponent<slotMachineProps> {
             <BottomButton
               title="Ready"
               onPress={this.onReady}
-              confirmColor="#444"
+              confirmColor={theme === "dark" ? "#c1c1c1" : "#444"}
               disabled={disabled}
             />
           </Popup>

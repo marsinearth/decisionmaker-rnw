@@ -36,8 +36,20 @@
   display: none;
 }
 .rmc-picker-popup-header {
-  background-image: -webkit-linear-gradient(top, #e7e7e7, #e7e7e7, transparent, transparent);
-  background-image: linear-gradient(to bottom, #e7e7e7, #e7e7e7, transparent, transparent);
+  background-image: -webkit-linear-gradient(
+    top,
+    #e7e7e7,
+    #e7e7e7,
+    transparent,
+    transparent
+  );
+  background-image: linear-gradient(
+    to bottom,
+    #e7e7e7,
+    #e7e7e7,
+    transparent,
+    transparent
+  );
   background-position: bottom;
   background-size: 100% 1px;
   background-repeat: no-repeat;
@@ -45,7 +57,7 @@
   display: -ms-flexbox;
   display: flex;
   -ms-flex-direction: row;
-      flex-direction: row;
+  flex-direction: row;
 }
 .rmc-picker-popup-header-left,
 .rmc-picker-popup-header-right {
@@ -53,7 +65,7 @@
   padding-right: 15px;
 }
 .rmc-picker-popup-item {
-  font-family: 'bungee', cursive;
+  font-family: "bungee", cursive;
   font-weight: 700;
   color: #0ae;
   font-size: 18px;
@@ -69,9 +81,10 @@
 }
 .rmc-picker-popup-title {
   -ms-flex: 1;
-      flex: 1;
+  flex: 1;
   color: #666;
   cursor: default;
+  padding-right: 58.8px;
 }
 .rmc-picker-popup-fade-enter,
 .rmc-picker-popup-fade-appear {
