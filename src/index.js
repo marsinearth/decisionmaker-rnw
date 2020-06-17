@@ -28,27 +28,18 @@ const injectBody = () => {
   const cssText = `html {
     background-color: #eef4f7;
   } 
-  html[data-theme='dark'] {
+
+  html[data-theme="dark"] {
     background-color: black;
-
-    textarea[name='question'] {
-      color: white;
-    }
-
-    .rmc-picker-popup {
-      background-color: black;
-    }
-    .rmc-picker-mask {
-      background-image: linear-gradient(
-        to bottom,
-        rgba(0, 0, 0, 0.95),
-        rgba(0, 0, 0, 0.6)
-      ),
-      linear-gradient(to top, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.6))
-    }
   }
-
   
+  html[data-theme="dark"] .rmc-picker-popup {
+    background-color: black;
+  }
+    
+  html[data-theme="dark"] .rmc-picker-mask {
+    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.6)), linear-gradient(to top, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.6))
+  }
   `;
 
   const style = document.createElement("style");
