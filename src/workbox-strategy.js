@@ -1,4 +1,4 @@
-import { CacheFirst, StaleWhileRevalidate } from "workbox-strategies";
+import { CacheFirst } from "workbox-strategies";
 import { clientsClaim, skipWaiting } from "workbox-core";
 
 import { precacheAndRoute } from "workbox-precaching";
@@ -10,8 +10,8 @@ precacheAndRoute(self.__WB_MANIFEST);
 skipWaiting();
 clientsClaim();
 
-registerRoute("/", new StaleWhileRevalidate());
-registerRoute("/manifest.json", new StaleWhileRevalidate());
-registerRoute("/workbox-strategy.js", new StaleWhileRevalidate());
+registerRoute("/", new CacheFirst());
+registerRoute("/manifest.json", new CacheFirst());
+registerRoute("/workbox-strategy.js", new CacheFirst());
 
 registerRoute(/^.*\.png$/, new CacheFirst());
