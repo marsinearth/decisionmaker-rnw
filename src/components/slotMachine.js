@@ -1,23 +1,32 @@
-import "rmc-picker/assets/index.css";
-import "rmc-picker/assets/popup.css";
+// @flow
+import 'rmc-picker/assets/index.css';
+import 'rmc-picker/assets/popup.css';
 
-import { BottomButton, item } from "./App";
-import { Keyboard, ScrollView, StyleSheet, View } from "react-native";
-import React, { PureComponent } from "react";
+import React, { PureComponent } from 'react';
 
-import { MAX_ITEM_LIST_NUM } from "../utils";
-import Picker from "rmc-picker/es/Picker";
-import Popup from "rmc-picker/es/Popup";
+import debounce from 'lodash.debounce';
+import {
+  Keyboard,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
+import Picker from 'rmc-picker/es/Picker';
+import Popup from 'rmc-picker/es/Popup';
 
-// import throttle from "lodash.throttle";
+import { MAX_ITEM_LIST_NUM } from '../utils';
+import {
+  BottomButton,
+  item,
+} from './App';
 
 // TODO: gotta deal with the structure of this.state.items. you can't deal with the negative labels in current structure
 
 type PickerCompProps = {
   items: item[],
   value: string,
-  onChangeValue: () => void,
-  onLoadMore: () => void,
+  onChangeValue: (value: any) => void,
+  onCalibrate: (dataLength: Number) => void,
 };
 
 type slotMachineProps = {
@@ -52,27 +61,26 @@ const PickerComp = ({
   items,
   value,
   onChangeValue,
-}: // onLoadMore,
-PickerCompProps) => (
+  onCalibrate,
+}: PickerCompProps) => (
   <Picker
     selectedValue={value}
     onValueChange={onChangeValue}
-    // onScrollChange={
-    //   throttle(
-    //     (scrollHeight) => {
-    //       console.log('%c scrollHeight: ', 'background-color:purple; color:#FFF;', scrollHeight)
-    //       if (scrollHeight <= 20) {
-    //         console.log('%c items[0].label: ', 'background-color:purple; color:#FFF;', items[0].label)
-    //         onLoadMore('prev')
-    //       } else if (scrollHeight >= items.length - 20) {
-    //         console.log('%c items.length - 200: ', 'background-color:purple; color:#FFF;', items.length - 200)
-    //         onLoadMore('next')
-    //       }
-    //     },
-    //     2000,
-    //     { trailing: false }
-    //   )
-    // }
+    onScrollChange={
+      debounce(
+        (scrollHeight) => {
+          // console.log('%c scrollHeight: ', 'background-color:purple; color:#FFF;', scrollHeight)
+          if (scrollHeight <= 500) {
+            console.log('%c items[500].label: ', 'background-color:hotpink; color:#FFF;', items[500].label)
+            onCalibrate(items.length)
+          } else if (scrollHeight >= items.length - 500) {
+            console.log('%c items.length - 500: ', 'background-color:indianred; color:#FFF;', items.length - 500)
+            onCalibrate(items.length)
+          }
+        },
+        1500
+      )
+    }
   >
     {items.map(({ label, datum }, index) => (
       <Picker.Item key={index} value={label}>
@@ -109,7 +117,7 @@ export default class SlotMachine extends PureComponent<slotMachineProps> {
     }
   }
 
-  onReset = (cbFunc) => {
+  onReset = (cbFunc: () => Promise<void>) => {
     this.setState({ items: [] }, cbFunc);
   };
 
@@ -125,12 +133,11 @@ export default class SlotMachine extends PureComponent<slotMachineProps> {
 
   onReady = () => {
     Keyboard.dismiss();
-    this.onReset(() => {
-      this.onItemsCalculate().then(({ generatedArray, num }) => {
-        const itemsLength = generatedArray.length;
-        const value = this.calibrateValue(itemsLength, num);
-        this.setState({ value, items: generatedArray });
-      });
+    this.onReset(async () => {
+      const { generatedArray, num } = await this.onItemsCalculate();
+      const itemsLength = generatedArray.length;
+      const value = this.calibrateValue(itemsLength, num);
+      this.setState({ value, items: generatedArray });
     });
   };
 
@@ -140,35 +147,11 @@ export default class SlotMachine extends PureComponent<slotMachineProps> {
     this.props.answer(datum);
   };
 
-  onChangeValue = (value) => {
+  onChangeValue = (value: number) => {
     this.setState({ value });
   };
 
-  onLoadMore = async (order) => {
-    const { generatedArray } = await this.onItemsCalculate(order, true);
-    console.log("generatedArray: ", generatedArray);
-    this.setState(
-      (prevState) => {
-        if (order === "prev") {
-          return {
-            items: [...generatedArray, ...prevState.items],
-          };
-        } else {
-          return {
-            items: [...prevState.items, ...generatedArray],
-          };
-        }
-      },
-      () => {
-        console.log(
-          "after setState of items on onLoadMore: ",
-          this.state.items
-        );
-      }
-    );
-  };
-
-  calibrateValue = (dataLength, num) => {
+  calibrateValue = (dataLength: number, num: number) => {
     let calcNum;
     if (num === 0) {
       calcNum = 1;
@@ -176,6 +159,7 @@ export default class SlotMachine extends PureComponent<slotMachineProps> {
       calcNum = num;
     }
     const comp = Math.floor((Math.floor(dataLength / calcNum) * calcNum) / 2);
+    console.log('on calibrate: ', { dataLength, calcNum, comp })
     return comp - (comp % calcNum);
   };
 
@@ -210,6 +194,11 @@ export default class SlotMachine extends PureComponent<slotMachineProps> {
     return { data, startIdx, endIdx, limit, num };
   };
 
+  onCalibrate = (dataLength: number) => {
+    const value = this.calibrateValue(dataLength, 0);
+    this.setState(prev => ({ ...prev, value }))
+  }
+
   render() {
     const { disabled, theme } = this.props;
     const { items, value } = this.state;
@@ -224,7 +213,7 @@ export default class SlotMachine extends PureComponent<slotMachineProps> {
               items,
               value,
               onChangeValue: this.onChangeValue,
-              // onLoadMore: this.onLoadMore
+              onCalibrate: this.onCalibrate
             })}
             title="Roll & Pick!!!"
             value={value}
