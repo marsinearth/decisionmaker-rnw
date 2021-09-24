@@ -1,3 +1,10 @@
+// @flow
+import React, {
+  createRef,
+  PureComponent,
+} from 'react';
+
+import produce from 'immer';
 import {
   Image,
   SafeAreaView,
@@ -6,20 +13,18 @@ import {
   TextInput,
   TouchableHighlight,
   View,
-} from "react-native";
+} from 'react-native';
+import { CheckBox } from 'react-native-elements';
+
+import cogito from '../assets/cogito_loading.gif';
 import {
+  findReactElement,
   MAX_ITEM_LIST_NUM,
   RATIO_OF_CHARS_MAX_FOR_WIDTH,
-  findReactElement,
-} from "../utils";
-import React, { PureComponent, createRef } from "react";
-
-import { CheckBox } from "react-native-elements";
-import ErrorBoundary from "./errorBoundary";
-import SelectedOptions from "./selectedOptions";
-import SlotMachine from "./slotMachine";
-import cogito from "../assets/cogito_loading.gif";
-import produce from "immer";
+} from '../utils';
+import ErrorBoundary from './errorBoundary';
+import SelectedOptions from './selectedOptions';
+import SlotMachine from './slotMachine';
 
 type BBtnProps = {
   title: string,
@@ -30,7 +35,7 @@ type BBtnProps = {
   onPressOut: () => void,
 };
 
-export type item = {
+export type Item = {
   label: number,
   datum: {
     placeholder: string,
@@ -50,7 +55,7 @@ type AppState = {
   disabled: boolean,
 };
 
-const initTFItems: item[] = [
+const initTFItems: Item['datum'][] = [
   {
     placeholder: "True",
     value: "True",
@@ -61,7 +66,7 @@ const initTFItems: item[] = [
   },
 ];
 
-const initItems: item[] = [
+const initItems: Item['datum'][] = [
   {
     placeholder: "item 1",
     value: "",
@@ -105,14 +110,14 @@ export default class App extends PureComponent<any, AppState> {
     question: "",
     questionWidth: 0,
     maxInputIndex: 1,
-    numRange: ["", ""],
+    numRange: [0, 0],
     numOfLines: 1,
     items: initTFItems,
     answer: "",
     disabled: false,
   };
 
-  questionRef = createRef();
+  questionRef = createRef<TextInput>();
 
   componentDidMount() {
     const { theme } = document.documentElement.dataset;

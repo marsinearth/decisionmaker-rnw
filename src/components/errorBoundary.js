@@ -1,6 +1,9 @@
-import React, { PureComponent } from 'react'
+import React, {
+  PropsWithChildren,
+  PureComponent,
+} from 'react';
 
-export default class ErrorBoundary extends PureComponent {
+export default class ErrorBoundary extends PureComponent<PropsWithChildren<unknown>> {
   state = { hasError: false };
 
   componentDidCatch(error, info) {

@@ -1,17 +1,19 @@
 {
   "parser": "babel-eslint",
   "env": {
-    "node": true, 
-    "es6": true, 
+    "node": true,
+    "es6": true,
     "browser": true
   },
-  "plugins": [
-    "import",
-    "react"
-  ],
   "extends": [
     "eslint:recommended",
-    "plugin:react/recommended"
+    "plugin:react/recommended",
+    "plugin:flowtype/recommended"
+  ],
+  "plugins": [
+    "import",
+    "react",
+    "flowtype"
   ],
   "rules": {
     "no-console": 0,
