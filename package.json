@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "immer": "^9.0.6",
+    "lodash.debounce": "^4.0.8",
     "lodash.throttle": "^4.1.1",
     "react": "16.5.1",
     "react-app-rewire-workbox": "^2.0.1",
@@ -27,12 +28,15 @@
     "start": "react-app-rewired start",
     "build": "GENERATE_SOURCEMAP=false react-app-rewired build && echo '/*    /index.html   200' > build/_redirects",
     "test": "react-app-rewired test --env=jsdom",
-    "eject": "react-app-rewired eject"
+    "eject": "react-app-rewired eject",
+    "flow": "flow"
   },
   "devDependencies": {
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-plugin-transform-react-jsx-source": "^6.22.0",
     "create-react-class": "^15.6.3",
+    "eslint-plugin-flowtype": "^6.1.0",
+    "flow-bin": "^0.160.2",
     "react-app-rewire-babel-loader": "^0.1.1",
     "sw-precache": "^5.2.1"
   },
