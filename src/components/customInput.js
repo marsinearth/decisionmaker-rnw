@@ -1,6 +1,10 @@
-import { StyleSheet, TextInput, View } from "react-native";
+import React from 'react';
 
-import React from "react";
+import {
+  StyleSheet,
+  TextInput,
+  View,
+} from 'react-native';
 
 const CustomInputText = (props) => (
   <View
@@ -9,7 +13,7 @@ const CustomInputText = (props) => (
       { shadowColor: props.theme === "dark" ? "#dcdcdc" : "#2e2e2e" },
     ]}
   >
-    <TextInput {...props} />
+    <TextInput {...props} editable={!(props.placeholder === 'True' || props.placeholder === 'False')}/>
   </View>
 );
 
