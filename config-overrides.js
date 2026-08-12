@@ -10,6 +10,30 @@ const {
 const appDirectory = fs.realpathSync(process.cwd());
 const resolveApp = (relativePath) => path.resolve(appDirectory, relativePath);
 
+function initializeWorkboxSourceMap() {
+  if (typeof fetch !== "function") {
+    return;
+  }
+
+  try {
+    const { SourceMapConsumer } = require("workbox-build/node_modules/source-map");
+    const wasmPath = require.resolve(
+      "workbox-build/node_modules/source-map/lib/mappings.wasm"
+    );
+    const wasmDataUrl = `data:application/wasm;base64,${fs
+      .readFileSync(wasmPath)
+      .toString("base64")}`;
+
+    SourceMapConsumer.initialize({
+      "lib/mappings.wasm": wasmDataUrl,
+    });
+  } catch (error) {
+    // Older dependency trees can differ; skip the shim if this path is absent.
+  }
+}
+
+initializeWorkboxSourceMap();
+
 module.exports = function override(config, env) {
   const vectorIcons = resolveApp("node_modules/react-native-vector-icons");
   const elements = resolveApp("node_modules/react-native-elements");
@@ -21,7 +45,10 @@ module.exports = function override(config, env) {
   };
 
   config = rewireBabelLoader.include(config, elements, vectorIcons);
-  config = rewireWorkboxInject(workboxConfig)(config, env);
+
+  if (env === "production") {
+    config = rewireWorkboxInject(workboxConfig)(config, env);
+  }
 
   return config;
 };

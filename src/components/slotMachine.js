@@ -1,22 +1,20 @@
 // @flow
 import 'rmc-picker/assets/index.css';
 import 'rmc-picker/assets/popup.css';
-
 import React, { PureComponent } from 'react';
-
 import debounce from 'lodash.debounce';
 import {
   Keyboard,
   ScrollView,
   StyleSheet,
   View,
+  Text,
+  TouchableHighlight,
 } from 'react-native';
 import Picker from 'rmc-picker/es/Picker';
 import Popup from 'rmc-picker/es/Popup';
-
 import { MAX_ITEM_LIST_NUM } from '../utils';
 import {
-  BottomButton,
   item,
 } from './App';
 
@@ -35,7 +33,17 @@ type slotMachineProps = {
   items: item[],
   numRange: number[],
   disabled: boolean,
+  touchEnabled: boolean,
   answer: () => void,
+};
+
+type BBtnProps = {
+  title: string,
+  onPress: () => void,
+  disabled: boolean,
+  confirmColor: string,
+  leftMargin: number,
+  onPressOut: () => void,
 };
 
 const generateArray = async ({ data, startIdx, endIdx, limit, num, more }) => {
@@ -90,6 +98,36 @@ const PickerComp = ({
   </Picker>
 );
 
+export const BottomButton = ({
+  title,
+  onPress,
+  disabled,
+  confirmColor,
+  leftMargin,
+  onPressOut,
+}: BBtnProps) => (
+  <View style={leftMargin}>
+    <TouchableHighlight
+      activeOpacity={0.5}
+      underlayColor="#d7dbdd"
+      disabled={disabled}
+      onPress={onPress}
+      onPressOut={onPressOut}
+    >
+      <View style={styles.readyBtnContainer}>
+        <Text
+          style={[
+            styles.readyBtnText,
+            { color: disabled ? "#888" : confirmColor },
+          ]}
+        >
+          {title}
+        </Text>
+      </View>
+    </TouchableHighlight>
+  </View>
+);
+
 export default class SlotMachine extends PureComponent<slotMachineProps> {
   state = {
     items: [],
@@ -131,14 +169,31 @@ export default class SlotMachine extends PureComponent<slotMachineProps> {
     return await generateArray({ num: newNum, ...processedData, more });
   };
 
+  onGetRandomValueIndex = (dataLength: number) => {
+    const randomIdx = Math.floor(Math.random() * dataLength);
+    return randomIdx;
+  }
+
+  onGetValue = (itemsLength: number, num: number) => {
+    if (!this.props.touchEnabled) {
+      return this.onGetRandomValueIndex(itemsLength);
+    }
+    return this.calibrateValue(itemsLength, num);
+  }
+
   onReady = () => {
     Keyboard.dismiss();
     this.onReset(async () => {
       const { generatedArray, num } = await this.onItemsCalculate();
       const itemsLength = generatedArray.length;
-      const value = this.calibrateValue(itemsLength, num);
-      this.setState({ value, items: generatedArray });
+      const value = this.onGetValue(itemsLength, num);
+      this.setState({ value, items: generatedArray }, () => {
+        if (!this.props.touchEnabled) {
+          this.onOk();
+        }
+      });
     });
+
   };
 
   onOk = () => {
@@ -147,7 +202,7 @@ export default class SlotMachine extends PureComponent<slotMachineProps> {
     this.props.answer(datum);
   };
 
-  onChangeValue = (value: number) => {
+  onChangeValue = (value: string) => {
     this.setState({ value });
   };
 
@@ -218,8 +273,7 @@ export default class SlotMachine extends PureComponent<slotMachineProps> {
             title="Roll & Pick!!!"
             value={value}
             onOk={this.onOk}
-            onDismiss={this.onDismiss}
-            disabled={disabled}
+            disabled={!this.props.touchEnabled || disabled}
             triggerType="onPressOut"
           >
             <BottomButton
@@ -240,5 +294,21 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     overflow: "hidden",
+  },
+  readyBtnContainer: {
+    width: 60,
+    borderRadius: 3,
+    borderWidth: 1,
+    borderColor: "#999",
+    padding: "0.4rem",
+    cursor: "pointer",
+    outline: "none",
+    boxSizing: "border-box",
+  },
+  readyBtnText: {
+    fontFamily: "bungee, cursive",
+    lineHeight: "1rem",
+    fontSize: "0.7rem",
+    textAlign: "center",
   },
 });

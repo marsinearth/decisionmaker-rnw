@@ -1,4 +1,3 @@
-import AppStart from "./index";
 // In production, we register a service worker to serve assets from local cache.
 
 // This lets the app load faster on subsequent visits in production, and gives
@@ -18,12 +17,6 @@ const isLocalhost = Boolean(
       /^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/
     )
 );
-
-const postSWRegister = () => {
-  navigator.serviceWorker.ready.then(() => {
-    AppStart();
-  });
-};
 
 export function register(config) {
   if ("serviceWorker" in navigator) {
@@ -55,8 +48,6 @@ export function register(config) {
         // Is not local host. Just register service worker
         registerValidSW(swUrl, config);
       }
-
-      postSWRegister();
     });
   }
 }
@@ -94,7 +85,6 @@ function registerValidSW(swUrl, config) {
     })
     .catch((error) => {
       console.error("Error during service worker registration:", error);
-      AppStart();
     });
 }
 
