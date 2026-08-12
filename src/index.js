@@ -85,10 +85,7 @@ const AppStart = () => {
   );
 };
 
-if (!("serviceWorker" in navigator)) {
-  AppStart();
-}
-
+AppStart();
 register();
 
 export default AppStart;
