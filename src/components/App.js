@@ -11,29 +11,20 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TouchableHighlight,
   View,
 } from 'react-native';
 import { CheckBox } from 'react-native-elements';
 
 import cogito from '../assets/cogito_loading.gif';
 import {
+  checkNonTouchDevice,
   findReactElement,
   MAX_ITEM_LIST_NUM,
   RATIO_OF_CHARS_MAX_FOR_WIDTH,
 } from '../utils';
 import ErrorBoundary from './errorBoundary';
 import SelectedOptions from './selectedOptions';
-import SlotMachine from './slotMachine';
-
-type BBtnProps = {
-  title: string,
-  onPress: () => void,
-  disabled: boolean,
-  confirmColor: string,
-  leftMargin: number,
-  onPressOut: () => void,
-};
+import SlotMachine, { BottomButton } from './slotMachine';
 
 export type Item = {
   label: number,
@@ -73,36 +64,6 @@ const initItems: Item['datum'][] = [
   },
 ];
 
-export const BottomButton = ({
-  title,
-  onPress,
-  disabled,
-  confirmColor,
-  leftMargin,
-  onPressOut,
-}: BBtnProps) => (
-  <View style={leftMargin}>
-    <TouchableHighlight
-      activeOpacity={0.5}
-      underlayColor="#d7dbdd"
-      disabled={disabled}
-      onPress={onPress}
-      onPressOut={onPressOut}
-    >
-      <View style={styles.readyBtnContainer}>
-        <Text
-          style={[
-            styles.readyBtnText,
-            { color: disabled ? "#888" : confirmColor },
-          ]}
-        >
-          {title}
-        </Text>
-      </View>
-    </TouchableHighlight>
-  </View>
-);
-
 export default class App extends PureComponent<any, AppState> {
   state = {
     theme: "light",
@@ -115,15 +76,19 @@ export default class App extends PureComponent<any, AppState> {
     items: initTFItems,
     answer: "",
     disabled: false,
+    touchEnabled: true,
   };
 
-  questionRef = createRef<TextInput>();
+  questionRef = createRef < TextInput > ();
 
   componentDidMount() {
     const { theme } = document.documentElement.dataset;
     console.log({ theme });
     if (this.state.theme !== theme) {
       this.setState({ theme });
+    }
+    if (checkNonTouchDevice()) {
+      this.setState({ touchEnabled: false });
     }
   }
 
@@ -143,7 +108,7 @@ export default class App extends PureComponent<any, AppState> {
     if (itemsLen !== prevItemsLen) {
       this.setState({ disabled: items[0].value.trim() === "" });
     }
-    if (from !== prevFrom || to !== prevTo) {
+    if ((from !== prevFrom || to !== prevTo)) {
       this.setState({ disabled: numRange.some((range) => range === "") });
     }
     if (selectedOption === "T/F" && prevSelectedOption !== selectedOption) {
@@ -326,6 +291,7 @@ export default class App extends PureComponent<any, AppState> {
       answer,
       disabled,
       numOfLines,
+      touchEnabled
     } = this.state;
     const selectedOptionsProps = {
       theme,
@@ -404,6 +370,7 @@ export default class App extends PureComponent<any, AppState> {
               numRange={numRange}
               disabled={disabled}
               answer={this.answerOn}
+              touchEnabled={touchEnabled}
             />
             <BottomButton
               title="Reset"
@@ -505,23 +472,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignSelf: "center",
   },
-  readyBtnContainer: {
-    width: 60,
-    borderRadius: 3,
-    borderWidth: 1,
-    borderColor: "#999",
-    padding: "0.4rem",
-    cursor: "pointer",
-    outline: "none",
-    boxSizing: "border-box",
-  },
   leftMargin: {
     marginLeft: 10,
-  },
-  readyBtnText: {
-    fontFamily: "bungee, cursive",
-    lineHeight: "1rem",
-    fontSize: "0.7rem",
-    textAlign: "center",
   },
 });
